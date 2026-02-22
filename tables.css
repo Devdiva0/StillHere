@@ -1,0 +1,60 @@
+/* ============================
+   TABLES & VOICE ROOM STYLES
+=============================== */
+
+.tables-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tables-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.tables-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.table-card {
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-card:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.table-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.live-badge {
+    background: #e2f0de;
+    color: #4a8647;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.table-host {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.table-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 15px;
+}

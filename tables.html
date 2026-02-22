@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tables — StillHere</title>
+
+    <meta name="description" content="Quiet voice rooms for presence, not performance." />
+
+    <!-- Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="tables.css" />
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="nav" id="navbar">
+        <div class="logo"><a href="index.html">StillHere</a></div>
+        <nav>
+            <a href="problem.html">Problem</a>
+            <a href="solution.html">Solution</a>
+            <a href="tables.html" class="active">Tables</a>
+            <a href="join.html">Join</a>
+        </nav>
+    </header>
+
+    <!-- Tables Main -->
+    <section class="section reveal tables-section" style="margin-top: 100px;">
+        <div class="tables-header">
+            <h2>Active Tables</h2>
+            <button class="primary-btn" id="create-table-btn">Start a new Table</button>
+        </div>
+        <p class="tables-subtitle">Small, quiet audio rooms. Join to listen. Take a chair to speak.</p>
+
+        <div class="cards tables-grid">
+            <!-- Table Card 1 -->
+            <div class="card table-card" onclick="window.location.href='room.html'">
+                <div class="table-card-header">
+                    <h3>Digital Burnout</h3>
+                    <span class="live-badge">Live</span>
+                </div>
+                <p class="table-host">Hosted by <strong>Alice</strong></p>
+                <div class="table-stats">
+                    <span>🎙️ 3/6 Speaking</span>
+                    <span>👁️ 12 Listening</span>
+                </div>
+            </div>
+
+            <!-- Table Card 2 -->
+            <div class="card table-card" onclick="window.location.href='room.html'">
+                <div class="table-card-header">
+                    <h3>Late Night Thoughts</h3>
+                    <span class="live-badge">Live</span>
+                </div>
+                <p class="table-host">Hosted by <strong>Marcus</strong></p>
+                <div class="table-stats">
+                    <span>🎙️ 6/6 Speaking (Full)</span>
+                    <span>👁️ 45 Listening</span>
+                </div>
+            </div>
+
+            <!-- Table Card 3 -->
+            <div class="card table-card" onclick="window.location.href='room.html'">
+                <div class="table-card-header">
+                    <h3>Why we are StillHere</h3>
+                    <span class="live-badge">Live</span>
+                </div>
+                <p class="table-host">Hosted by <strong>David</strong></p>
+                <div class="table-stats">
+                    <span>🎙️ 2/6 Speaking</span>
+                    <span>👁️ 5 Listening</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="margin-top: auto;">
+        <p>© 2026 StillHere</p>
+        <p>We are still here with you.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

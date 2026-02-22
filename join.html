@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join — StillHere</title>
+
+    <meta name="description" content="Join the waitlist for StillHere." />
+
+    <!-- Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="home.css" />
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="nav" id="navbar">
+        <div class="logo"><a href="index.html"
+                style="margin-left:0; color:var(--text-primary); text-decoration:none;">StillHere</a></div>
+        <nav>
+            <a href="problem.html">Problem</a>
+            <a href="solution.html">Solution</a>
+            <a href="tables.html">Tables</a>
+            <a href="join.html" class="active">Join</a>
+        </nav>
+    </header>
+
+    <!-- Waitlist -->
+    <section class="section waitlist reveal" id="waitlist" style="margin-top: 100px;">
+        <div class="waitlist-card">
+            <h2>Be part of the quiet internet.</h2>
+
+            <form class="waitlist-form" id="waitlist-form">
+                <input type="email" id="email-input" placeholder="Enter your email" required />
+                <button type="submit">Join Queue</button>
+            </form>
+
+            <div id="form-message" class="hidden"></div>
+
+            <p class="small-note">
+                No spam. No noise. Just updates when we’re ready.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="position: absolute; bottom: 0; width: 100%;">
+        <p>© 2026 StillHere</p>
+        <p>We are still here with you.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
