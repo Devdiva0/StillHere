@@ -1,13 +1,3 @@
-// Nav scroll effect
-const navbar = document.getElementById("navbar");
-window.addEventListener("scroll", () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add("scrolled");
-    } else {
-        navbar.classList.remove("scrolled");
-    }
-});
-
 // "Join Waitlist" secondary button in hero goes to join page
 const joinBtn = document.getElementById("join-btn");
 if (joinBtn) {
