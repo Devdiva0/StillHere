@@ -150,7 +150,7 @@
 </head>
 
 <body>
-                                        <!-- Side Navigation -->
+    <!-- Side Navigation -->
     <aside class="side-nav">
         <div class="logo">
             <a href="index.html" class="logo-link">
@@ -159,12 +159,17 @@
             </a>
         </div>
         <nav class="nav-main">
-            <a href="index.html" class="nav-item "><span class="material-symbols-outlined">home</span> <span class="nav-label">Home</span></a>
-            <a href="problem.html" class="nav-item "><span class="material-symbols-outlined">psychology</span> <span class="nav-label">Problem</span></a>
-            <a href="solution.html" class="nav-item "><span class="material-symbols-outlined">spa</span> <span class="nav-label">Solution</span></a>
-            <a href="tables.html" class="nav-item "><span class="material-symbols-outlined">groups</span> <span class="nav-label">Rooms</span></a>
-            <a href="#" class="nav-item " onclick="openShareModal(event)"><span class="material-symbols-outlined">add_box</span> <span class="nav-label">Share</span></a>
-            <a href="join.html" class="nav-item "><span class="material-symbols-outlined">add_circle</span> <span class="nav-label">Waitlist</span></a>
+            <a href="index.html" class="nav-item "><span class="material-symbols-outlined">home</span> <span
+                    class="nav-label">Home</span></a>
+            <a href="problem.html" class="nav-item "><span class="material-symbols-outlined">psychology</span> <span
+                    class="nav-label">Problem</span></a>
+            <a href="solution.html" class="nav-item "><span class="material-symbols-outlined">spa</span> <span
+                    class="nav-label">Solution</span></a>
+            <a href="tables.html" class="nav-item "><span class="material-symbols-outlined">groups</span> <span
+                    class="nav-label">Rooms</span></a>
+            <a href="#" class="nav-item " onclick="openShareModal(event)"><span
+                    class="material-symbols-outlined">add_box</span> <span class="nav-label">Share</span></a>
+
         </nav>
         <nav class="nav-bottom">
             <a href="profile.html" class="nav-item nav-profile-link " title="Profile">
@@ -173,7 +178,8 @@
                 </div>
                 <span class="nav-label">Profile</span>
             </a>
-            <a href="about.html" class="nav-item active"><span class="material-symbols-outlined">info</span> <span class="nav-label">About</span></a>
+            <a href="about.html" class="nav-item active"><span class="material-symbols-outlined">info</span> <span
+                    class="nav-label">About</span></a>
         </nav>
     </aside>
 
@@ -187,7 +193,7 @@
             </div>
             <div class="modal-compose-box">
                 <textarea id="modal-moment-input" placeholder="What's on your mind?"></textarea>
-                
+
                 <div id="modal-media-preview" class="modal-media-preview">
                     <img id="modal-preview-img" src="" alt="Preview">
                     <video id="modal-preview-video" src="" controls style="display:none;"></video>
@@ -198,7 +204,8 @@
                         <label for="modal-media-upload" class="modal-tool-btn" title="Add Media">
                             <span class="material-symbols-outlined">image</span>
                         </label>
-                        <input type="file" id="modal-media-upload" accept="image/*,video/*" hidden onchange="handleModalMedia(this)">
+                        <input type="file" id="modal-media-upload" accept="image/*,video/*" hidden
+                            onchange="handleModalMedia(this)">
                     </div>
                     <button class="modal-post-btn" onclick="submitModalPost()">Post</button>
                 </div>

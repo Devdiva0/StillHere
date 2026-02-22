@@ -62,10 +62,10 @@
 }
 
 .room-brand {
-    font-family: 'Dancing Script', cursive;
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--accent);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #fff;
 }
 
 /* Base Two Column Layout */

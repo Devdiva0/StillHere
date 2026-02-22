@@ -297,7 +297,7 @@ revealElements.forEach((el, index) => {
 // Requesting to sit in an empty chair
 window.requestChair = (chairElement) => {
     // You would normally check permissions / fire a request to host here
-    const confirmed = confirm("Request permission from the Host to speak at this table?");
+    const confirmed = confirm("Request permission from the Host to speak in this room?");
     if (confirmed) {
         // Simulate being accepted into the seat
         chairElement.classList.remove("empty");
@@ -305,7 +305,7 @@ window.requestChair = (chairElement) => {
         chairElement.textContent = "";
         chairElement.setAttribute("data-tooltip", "You");
         chairElement.onclick = null; // Can't request it again
-        alert("The host allowed you to join the table! You are now speaking.");
+        alert("The host allowed you to join the room! You are now speaking.");
     }
 };
 // Chat Logic
