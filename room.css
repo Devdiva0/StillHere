@@ -230,8 +230,9 @@
 
 .chat-count {
     font-size: 11px;
-    color: #33c28b;
-    background: rgba(51, 194, 139, 0.1);
+    color: #e285a6;
+    /* Blush Pink */
+    background: rgba(226, 133, 166, 0.1);
     padding: 3px 8px;
     border-radius: 12px;
 }
@@ -393,8 +394,8 @@
 }
 
 .speaker-item.active-speaker .speaker-avatar {
-    border-color: #33c28b;
-    /* Thick green border indicating speaking */
+    border-color: #e285a6;
+    /* Thick blush pink border indicating speaking */
 }
 
 .speaker-name {

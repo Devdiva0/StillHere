@@ -20,12 +20,13 @@
 
 .table-card {
     cursor: pointer;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .table-card:hover {
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .table-card-header {
@@ -35,8 +36,9 @@
 }
 
 .live-badge {
-    background: #e2f0de;
-    color: #4a8647;
+    background: rgba(226, 133, 166, 0.15);
+    /* Soft rosy glow */
+    color: var(--accent);
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 11px;
@@ -55,6 +57,6 @@
     justify-content: space-between;
     font-size: 13px;
     color: var(--text-secondary);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 15px;
 }
