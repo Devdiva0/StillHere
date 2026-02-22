@@ -28,8 +28,8 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding-left: 260px;
-    /* Space for side nav */
+    padding-left: 84px;
+    /* Space for collapsed side nav */
 }
 
 h1,
@@ -44,30 +44,71 @@ h3 {
     position: fixed;
     top: 0;
     left: 0;
-    width: 260px;
+    width: 84px;
+    /* Collapsed width */
     height: 100vh;
     background: var(--bg-color);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    padding: 40px 20px 20px;
+    padding: 40px 14px 20px;
     z-index: 1000;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+.side-nav:hover {
+    width: 260px;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
 }
 
 .side-nav .logo {
     margin-bottom: 50px;
-    padding-left: 15px;
-    line-height: 0.6;
+    padding-left: 0;
+    line-height: 0.8;
 }
 
-.side-nav .logo a {
-    font-family: 'Dancing Script', cursive;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 1px;
-    font-size: 3.5rem;
+.side-nav .logo-link {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px 14px;
     text-decoration: none;
     color: var(--text-primary) !important;
+    height: 50px;
+}
+
+.side-nav .logo-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 32px;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+}
+
+.side-nav .logo-text {
+    position: absolute;
+    left: 14px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 3.2rem;
+    line-height: 0.8;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.side-nav:hover .logo-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.side-nav:hover .logo-text {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .side-nav nav {
@@ -80,12 +121,11 @@ h3 {
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 15px;
+    gap: 18px;
+    padding: 14px;
     border-radius: 12px;
     text-decoration: none;
     color: var(--text-primary);
-    font-size: 16px;
     font-weight: 500;
     transition: var(--transition);
     opacity: 0.8;
@@ -98,8 +138,24 @@ h3 {
 }
 
 .nav-item .material-symbols-outlined {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 300;
+    flex-shrink: 0;
+    width: 28px;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-label {
+    font-size: 16px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.side-nav:hover .nav-label {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* Nav Profile Avatar inside side nav */
@@ -108,15 +164,16 @@ h3 {
 }
 
 .nav-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 15px;
     border: 2px solid transparent;
     transition: var(--transition);
+    flex-shrink: 0;
 }
 
 .nav-item:hover .nav-avatar,
