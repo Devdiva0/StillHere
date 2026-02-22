@@ -48,6 +48,153 @@ if (primaryBtn) {
     });
 }
 
+/* ====================================
+   SHARE MODAL LOGIC (Instagram-style)
+==================================== */
+let modalMediaData = null;
+
+window.openShareModal = (e) => {
+    if (e) e.preventDefault();
+    const overlay = document.getElementById('share-modal-overlay');
+    if (overlay) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scroll
+    }
+};
+
+window.closeShareModal = (e) => {
+    if (e) e.stopPropagation();
+    const overlay = document.getElementById('share-modal-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        resetModal();
+    }
+};
+
+function resetModal() {
+    document.getElementById('modal-moment-input').value = '';
+    const previewContainer = document.getElementById('modal-media-preview');
+    previewContainer.style.display = 'none';
+    document.getElementById('modal-preview-img').src = '';
+    document.getElementById('modal-preview-video').src = '';
+    document.getElementById('modal-media-upload').value = '';
+    modalMediaData = null;
+}
+
+window.handleModalMedia = (input) => {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const previewContainer = document.getElementById('modal-media-preview');
+            const previewImg = document.getElementById('modal-preview-img');
+            const previewVid = document.getElementById('modal-preview-video');
+
+            modalMediaData = {
+                url: e.target.result,
+                type: file.type.startsWith('video/') ? 'video' : 'image'
+            };
+
+            previewContainer.style.display = 'block';
+            if (modalMediaData.type === 'image') {
+                previewImg.src = modalMediaData.url;
+                previewImg.style.display = 'block';
+                previewVid.style.display = 'none';
+            } else {
+                previewVid.src = modalMediaData.url;
+                previewVid.style.display = 'block';
+                previewImg.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+window.submitModalPost = () => {
+    const input = document.getElementById('modal-moment-input');
+    const text = input.value.trim();
+    if (!text && !modalMediaData) return;
+
+    const newPostData = {
+        name: "Fox",
+        avatar: "🦊",
+        color: "#39b59e",
+        time: "Just now",
+        text: text,
+        media: modalMediaData ? modalMediaData.url : null,
+        mediaType: modalMediaData ? modalMediaData.type : null,
+        count: 0
+    };
+
+    // Save to localStorage
+    const savedPosts = JSON.parse(localStorage.getItem('stillhere_posts') || '[]');
+    savedPosts.unshift(newPostData);
+    localStorage.setItem('stillhere_posts', JSON.stringify(savedPosts));
+
+    // If on home page, update feed immediately
+    const homeFeed = document.getElementById('home-moments-feed');
+    if (homeFeed) {
+        // Find createPostElement if it's already defined or accessible
+        // In script.js it is currently inside a conditional block. I should move it to global scope.
+        if (typeof createPostElement === 'function') {
+            homeFeed.insertBefore(createPostElement(newPostData), homeFeed.firstChild);
+        } else {
+            // Reload page or manually prepend if function not found
+            location.reload();
+        }
+    }
+
+    closeShareModal();
+    alert("Moment shared to the quiet.");
+};
+
+window.createPostElement = (postData) => {
+    const post = document.createElement('div');
+    post.className = 'post-card reveal active';
+
+    let mediaHtml = '';
+    if (postData.media) {
+        if (postData.mediaType === 'video') {
+            mediaHtml = `
+                <div class="post-media-container">
+                    <video class="post-media-content" src="${postData.media}" controls></video>
+                </div>
+            `;
+        } else {
+            mediaHtml = `
+                <div class="post-media-container">
+                    <img class="post-media-content" src="${postData.media}" alt="Serene moment">
+                </div>
+            `;
+        }
+    }
+
+    post.innerHTML = `
+        <div class="post-header">
+            <div class="post-avatar" style="background: ${postData.color};">${postData.avatar}</div>
+            <div class="post-info">
+                <span class="post-name">${postData.name}</span>
+                <span class="post-time">${postData.time}</span>
+            </div>
+        </div>
+        <div class="post-content">
+            <p class="post-text">${postData.text}</p>
+            ${mediaHtml}
+        </div>
+        <div class="post-actions">
+            <button class="support-btn" onclick="toggleSupport(this, ${postData.count})">
+                <span class="icon">👍</span>
+                <span class="support-text">Support</span>
+                <span class="support-count">・ ${postData.count}</span>
+            </button>
+        </div>
+    `;
+    return post;
+};
+
+
 // Toggle Support (Flower/Thumbs up)
 window.toggleSupport = (btn, initialCount) => {
     const isSupported = btn.classList.toggle('supported');
@@ -81,6 +228,12 @@ if (homeFeed && sentinel) {
         { name: "Luna", time: "1d ago", avatar: "🌙", color: "#a685e2", text: "The moon is beautiful tonight. Staring at the stars makes all the digital noise feel so small.", count: 42, media: "https://images.unsplash.com/photo-1507499739999-097706ad8914?auto=format&fit=crop&q=80&w=800" }
     ];
 
+    // Load saved posts from localStorage first
+    const savedPosts = JSON.parse(localStorage.getItem('stillhere_posts') || '[]');
+    savedPosts.forEach(postData => {
+        homeFeed.insertBefore(window.createPostElement(postData), homeFeed.firstChild);
+    });
+
     const loadMorePosts = () => {
         // Simulate loading state
         const loader = document.createElement('div');
@@ -96,39 +249,7 @@ if (homeFeed && sentinel) {
             // Add 2 random posts from mock data
             for (let i = 0; i < 2; i++) {
                 const postData = mockPosts[Math.floor(Math.random() * mockPosts.length)];
-                const post = document.createElement('div');
-                post.className = 'post-card reveal active';
-
-                let mediaHtml = '';
-                if (postData.media) {
-                    mediaHtml = `
-                        <div class="post-media-container">
-                            <img class="post-media-content" src="${postData.media}" alt="Serene moment">
-                        </div>
-                    `;
-                }
-
-                post.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-avatar" style="background: ${postData.color};">${postData.avatar}</div>
-                        <div class="post-info">
-                            <span class="post-name">${postData.name}</span>
-                            <span class="post-time">${postData.time}</span>
-                        </div>
-                    </div>
-                    <div class="post-content">
-                        <p class="post-text">${postData.text}</p>
-                        ${mediaHtml}
-                    </div>
-                    <div class="post-actions">
-                        <button class="support-btn" onclick="toggleSupport(this, ${postData.count})">
-                            <span class="icon">👍</span>
-                            <span class="support-text">Support</span>
-                            <span class="support-count">・ ${postData.count}</span>
-                        </button>
-                    </div>
-                `;
-                homeFeed.appendChild(post);
+                homeFeed.appendChild(window.createPostElement(postData));
             }
         }, 800);
     };

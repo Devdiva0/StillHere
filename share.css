@@ -3,8 +3,8 @@
 =============================== */
 
 .moments-container {
-    max-width: 650px;
-    margin: 150px auto 100px;
+    max-width: 700px;
+    margin: 60px auto;
     padding: 0 5%;
 }
 
@@ -267,20 +267,19 @@
 }
 
 .support-btn .icon {
-    font-size: 18px;
-    filter: saturate(0) opacity(0.5);
-    /* Desaturated initially */
+    font-size: 20px;
+    filter: saturate(0.2) opacity(0.6);
     transition: var(--transition);
 }
 
 .support-btn:hover .icon {
-    filter: saturate(0.5) opacity(0.8);
+    filter: saturate(0.8) opacity(0.9);
+    transform: scale(1.1);
 }
 
 .support-btn.supported .icon {
     filter: saturate(1) opacity(1);
-    /* Full color beautiful blossom */
-    transform: scale(1.1);
+    transform: scale(1.2);
 }
 
 .support-count {

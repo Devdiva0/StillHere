@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moments — StillHere</title>
+    <title>Share — StillHere</title>
 
     <meta name="description" content="Share thoughts and find gentle support without the noise." />
 
@@ -20,12 +20,12 @@
 
     <link rel="stylesheet" href="global.css" />
     <link rel="stylesheet" href="home.css" />
-    <link rel="stylesheet" href="moments.css" />
+    <link rel="stylesheet" href="share.css" />
 </head>
 
 <body>
 
-    <!-- Side Navigation -->
+                <!-- Side Navigation -->
     <aside class="side-nav">
         <div class="logo">
             <a href="index.html" class="logo-link">
@@ -33,32 +33,58 @@
                 <span class="logo-text">StillHere</span>
             </a>
         </div>
-        <nav>
-            <a href="index.html" class="nav-item "><span class="material-symbols-outlined">home</span> <span
-                    class="nav-label">Home</span></a>
-            <a href="problem.html" class="nav-item "><span class="material-symbols-outlined">psychology</span> <span
-                    class="nav-label">Problem</span></a>
-            <a href="solution.html" class="nav-item "><span class="material-symbols-outlined">spa</span> <span
-                    class="nav-label">Solution</span></a>
-            <a href="tables.html" class="nav-item "><span class="material-symbols-outlined">groups</span> <span
-                    class="nav-label">Rooms</span></a>
-            <a href="moments.html" class="nav-item active"><span class="material-symbols-outlined">chat_bubble</span>
-                <span class="nav-label">Moments</span></a>
-            <a href="join.html" class="nav-item "><span class="material-symbols-outlined">add_circle</span> <span
-                    class="nav-label">Waitlist</span></a>
+        <nav class="nav-main">
+            <a href="index.html" class="nav-item "><span class="material-symbols-outlined">home</span> <span class="nav-label">Home</span></a>
+            <a href="problem.html" class="nav-item "><span class="material-symbols-outlined">psychology</span> <span class="nav-label">Problem</span></a>
+            <a href="solution.html" class="nav-item "><span class="material-symbols-outlined">spa</span> <span class="nav-label">Solution</span></a>
+            <a href="tables.html" class="nav-item "><span class="material-symbols-outlined">groups</span> <span class="nav-label">Rooms</span></a>
+            <a href="#" class="nav-item active" onclick="openShareModal(event)"><span class="material-symbols-outlined">add_box</span> <span class="nav-label">Share</span></a>
+            <a href="join.html" class="nav-item "><span class="material-symbols-outlined">add_circle</span> <span class="nav-label">Waitlist</span></a>
+        </nav>
+        <nav class="nav-bottom">
             <a href="profile.html" class="nav-item nav-profile-link " title="Profile">
-                <div class="nav-avatar" style="background: #39b59e;">🦊</div>
+                <div class="nav-avatar-container">
+                    <div class="nav-avatar" style="background: #39b59e;">🦊</div>
+                </div>
                 <span class="nav-label">Profile</span>
             </a>
-            <a href="about.html" class="nav-item "><span class="material-symbols-outlined">info</span> <span
-                    class="nav-label">About</span></a>
+            <a href="about.html" class="nav-item "><span class="material-symbols-outlined">info</span> <span class="nav-label">About</span></a>
         </nav>
     </aside>
 
-    <!-- Moments Timeline -->
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="share-modal-overlay" onclick="closeShareModal(event)">
+        <div class="share-modal" onclick="event.stopPropagation()">
+            <span class="material-symbols-outlined modal-close" onclick="closeShareModal()">close</span>
+            <div class="share-modal-header">
+                <h2>Share a Moment</h2>
+                <p>Post to the quiet internet. No pressure, just presence.</p>
+            </div>
+            <div class="modal-compose-box">
+                <textarea id="modal-moment-input" placeholder="What's on your mind?"></textarea>
+                
+                <div id="modal-media-preview" class="modal-media-preview">
+                    <img id="modal-preview-img" src="" alt="Preview">
+                    <video id="modal-preview-video" src="" controls style="display:none;"></video>
+                </div>
+
+                <div class="modal-compose-actions">
+                    <div class="modal-tools">
+                        <label for="modal-media-upload" class="modal-tool-btn" title="Add Media">
+                            <span class="material-symbols-outlined">image</span>
+                        </label>
+                        <input type="file" id="modal-media-upload" accept="image/*,video/*" hidden onchange="handleModalMedia(this)">
+                    </div>
+                    <button class="modal-post-btn" onclick="submitModalPost()">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <div class="moments-container reveal">
         <div class="moments-header">
-            <h2>Moments</h2>
+            <h2>Share</h2>
             <p>Share a thought into the quiet. Receive gentle support without the pressure of likes.</p>
         </div>
 
@@ -225,6 +251,22 @@
             if (!text && !currentMediaData) return;
 
             const feed = document.getElementById('moments-feed');
+
+            // Save to localStorage for persistence across pages
+            const newPostData = {
+                name: "Fox",
+                avatar: "🦊",
+                color: "#39b59e",
+                time: "Just now",
+                text: text,
+                media: currentMediaData ? currentMediaData.url : null,
+                mediaType: currentMediaData ? currentMediaData.type : null,
+                count: 0
+            };
+
+            const savedPosts = JSON.parse(localStorage.getItem('stillhere_posts') || '[]');
+            savedPosts.unshift(newPostData);
+            localStorage.setItem('stillhere_posts', JSON.stringify(savedPosts));
 
             let mediaHtml = '';
             if (currentMediaData) {
