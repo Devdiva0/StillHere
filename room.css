@@ -2,7 +2,7 @@
    ROOM LAYOUT (Like Voice Room App)
 =============================== */
 .room-fullscreen-body {
-    background: #20242d;
+    background: var(--bg-color);
     /* Solid dark app background */
     background-image: none;
     /* override the global noise overlay so it looks solid like clubhouse */
@@ -17,7 +17,7 @@
 }
 
 .room-page-content {
-    background: #20242d;
+    background: var(--bg-color);
     width: 100%;
     max-width: none;
     min-height: 100vh;
@@ -162,7 +162,7 @@
     /* Start hidden off-screen */
     width: 380px;
     height: 100vh;
-    background: #15181e;
+    background: #120e10;
     /* deeper dark for chat background */
     display: flex;
     flex-direction: column;
@@ -277,7 +277,7 @@
 }
 
 .msg-text {
-    background: #2b303b;
+    background: rgba(255, 255, 255, 0.06);
     padding: 10px 14px;
     border-radius: 14px;
     border-top-left-radius: 4px;
@@ -296,7 +296,7 @@
 
 #chat-input {
     flex: 1;
-    background: #2b303b;
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid transparent;
     border-radius: 20px;
     padding: 12px 18px;
@@ -421,13 +421,13 @@
 }
 
 .empty-avatar {
-    background: #2b303b !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     color: #fff;
     border: none;
 }
 
 .empty-text {
-    background: #2b303b;
+    background: rgba(255, 255, 255, 0.06);
     padding: 6px 12px;
     border-radius: 12px;
     font-size: 11px;
@@ -482,12 +482,12 @@
     align-items: center;
     font-size: 30px;
     margin-bottom: 6px;
-    background: #2b303b;
+    background: rgba(255, 255, 255, 0.06);
     /* Fallback */
 }
 
 .invite-avatar {
-    background: #2b303b !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     color: #fff;
     font-size: 28px;
     font-weight: 300;
