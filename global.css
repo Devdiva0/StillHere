@@ -72,43 +72,30 @@ h3 {
 .side-nav .logo-link {
     display: flex;
     align-items: center;
-    position: relative;
+    gap: 12px;
     padding: 10px 14px;
     text-decoration: none;
     color: var(--text-primary) !important;
-    height: 50px;
 }
 
 .side-nav .logo-icon {
-    position: absolute;
-    left: 14px;
     font-size: 32px;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    opacity: 1;
+    color: var(--accent);
+    flex-shrink: 0;
 }
 
 .side-nav .logo-text {
-    position: absolute;
-    left: 14px;
-    font-family: 'Dancing Script', cursive;
-    font-size: 3.2rem;
-    line-height: 0.8;
-    font-weight: 700;
-    letter-spacing: 1px;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: opacity 0.3s ease;
     opacity: 0;
-    pointer-events: none;
-    white-space: nowrap;
-}
-
-.side-nav:hover .logo-icon {
-    opacity: 0;
-    pointer-events: none;
 }
 
 .side-nav:hover .logo-text {
     opacity: 1;
-    pointer-events: auto;
 }
 
 .side-nav nav {
