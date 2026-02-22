@@ -51,7 +51,20 @@
         <div class="compose-box">
             <textarea id="moment-input" placeholder="What's on your mind? No pressure, just presence..."
                 rows="3"></textarea>
+
+            <div id="media-preview-container" class="media-preview-container" style="display: none;">
+                <img id="media-preview-image" src="" alt="Selected Media" />
+                <button class="remove-media-btn" onclick="removeMedia()">✕</button>
+            </div>
+
             <div class="compose-actions">
+                <div class="compose-tools">
+                    <label for="media-upload" class="tool-btn" title="Add Photo or Video">
+                        <span class="material-symbols-outlined">image</span>
+                    </label>
+                    <input type="file" id="media-upload" accept="image/*,video/*" hidden
+                        onchange="previewMedia(this)" />
+                </div>
                 <button class="compose-btn" onclick="postMoment()">Share</button>
             </div>
         </div>
@@ -67,8 +80,8 @@
                     </div>
                 </div>
                 <div class="post-content">
-                    Sometimes I feel like everything moves too fast. Taking an hour today just to listen to the rain and
-                    do absolutely nothing. It helps.
+                    <p class="post-text">Sometimes I feel like everything moves too fast. Taking an hour today just to
+                        listen to the rain and do absolutely nothing. It helps.</p>
                 </div>
                 <div class="post-actions">
                     <button class="support-btn" onclick="toggleSupport(this, 12)">
@@ -89,8 +102,13 @@
                     </div>
                 </div>
                 <div class="post-content">
-                    Just finished reading a book that completely changed my perspective on solitude. Being alone doesn't
-                    have to mean being lonely.
+                    <p class="post-text">Just finished reading a book that completely changed my perspective on
+                        solitude. Being alone doesn't have to mean being lonely.</p>
+                    <div class="post-media-container">
+                        <img class="post-media-content"
+                            src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&q=80&w=800"
+                            alt="Abstract serene painting" />
+                    </div>
                 </div>
                 <div class="post-actions">
                     <button class="support-btn" onclick="toggleSupport(this, 34)">
@@ -111,8 +129,8 @@
                     </div>
                 </div>
                 <div class="post-content">
-                    I took a walk without my phone today. It's wild how much louder the world is when you aren't
-                    listening to a podcast. Actually heard the wind.
+                    <p class="post-text">I took a walk without my phone today. It's wild how much louder the world is
+                        when you aren't listening to a podcast. Actually heard the wind.</p>
                 </div>
                 <div class="post-actions">
                     <button class="support-btn supported" onclick="toggleSupport(this, 8)">
@@ -150,12 +168,58 @@
             }
         }
 
+        let currentMediaData = null;
+
+        function previewMedia(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const previewContainer = document.getElementById('media-preview-container');
+                    const previewImage = document.getElementById('media-preview-image');
+
+                    currentMediaData = {
+                        url: e.target.result,
+                        type: file.type.startsWith('video/') ? 'video' : 'image'
+                    };
+
+                    if (currentMediaData.type === 'image') {
+                        previewImage.src = currentMediaData.url;
+                        previewContainer.style.display = 'block';
+                    } else if (currentMediaData.type === 'video') {
+                        // Display placeholder frame for video in composer
+                        previewImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" fill="%231a1618"><rect width="200" height="150"/><text x="20" y="80" fill="%23a6959c" font-family="sans-serif">Video Attached</text></svg>';
+                        previewContainer.style.display = 'block';
+                    }
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeMedia() {
+            document.getElementById('media-upload').value = '';
+            document.getElementById('media-preview-container').style.display = 'none';
+            document.getElementById('media-preview-image').src = '';
+            currentMediaData = null;
+        }
+
         function postMoment() {
             const input = document.getElementById('moment-input');
             const text = input.value.trim();
-            if (!text) return;
+            if (!text && !currentMediaData) return;
 
             const feed = document.getElementById('moments-feed');
+
+            let mediaHtml = '';
+            if (currentMediaData) {
+                if (currentMediaData.type === 'image') {
+                    mediaHtml = `<img src="${currentMediaData.url}" class="post-media-content" alt="Moment media" />`;
+                } else if (currentMediaData.type === 'video') {
+                    mediaHtml = `<video src="${currentMediaData.url}" class="post-media-content" controls></video>`;
+                }
+            }
 
             const newPost = document.createElement('div');
             newPost.className = 'post-card';
@@ -168,7 +232,8 @@
                     </div>
                 </div>
                 <div class="post-content">
-                    ${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                    ${text ? `<p class="post-text">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : ''}
+                    ${mediaHtml ? `<div class="post-media-container">${mediaHtml}</div>` : ''}
                 </div>
                 <div class="post-actions">
                     <button class="support-btn" onclick="toggleSupport(this, 0)">
@@ -192,6 +257,7 @@
             }, 50);
 
             input.value = '';
+            removeMedia();
         }
     </script>
 </body>
