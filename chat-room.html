@@ -30,21 +30,16 @@
             <!-- App-like Room Header -->
             <div class="room-header">
                 <div style="width: 70px;"></div> <!-- Flex spacer -->
-                <div class="room-brand" id="modal-table-title">Digital Burnout</div>
+                <div class="room-brand" id="modal-table-title">Quiet Reflection</div>
                 <div class="header-actions">
-                    <button class="chat-toggle-btn" onclick="toggleChat()"
-                        style="display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
-                        Chat
-                    </button>
+                    <span class="live-badge">Chat</span>
                 </div> <!-- Flex spacer / actions -->
             </div>
 
             <div class="room-main-area">
                 <!-- Left Side: Speaker & Listener Board -->
                 <div class="room-body">
-                    <p class="room-host" style="margin-bottom: 20px;">Hosted by <strong
-                            id="modal-table-host">Alice</strong></p>
+                    <p class="room-host" style="margin-bottom: 20px;">Text-only space for shared silence.</p>
 
                     <div class="room-layout">
                         <div class="speaker-grid">
@@ -110,49 +105,8 @@
                         </div>
                     </div>
 
-                    <div class="listeners-section">
-                        <h3>Listen only</h3>
-                        <div class="listener-scroll">
-                            <div class="listener-item invite-btn" style="cursor: pointer;">
-                                <div class="listener-avatar invite-avatar">
-                                    +
-                                </div>
-                                <div class="listener-name">Invite</div>
-                                <div class="listener-lang" style="opacity:0">-</div>
-                            </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #f8dfb1;">
-                                    <span class="avatar-emoji">👱‍♀️</span>
-                                </div>
-                                <div class="listener-name">Tamika</div>
-                                <div class="listener-lang">AU</div>
-                            </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #f1ebd8;">
-                                    <span class="avatar-emoji">👨🏾</span>
-                                </div>
-                                <div class="listener-name">Daniel</div>
-                                <div class="listener-lang">ID</div>
-                            </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #d8c2b5;">
-                                    <span class="avatar-emoji">👩🏽</span>
-                                </div>
-                                <div class="listener-name">지혜 (Jihye)</div>
-                                <div class="listener-lang">KO</div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Room Bottom Controls -->
-                    <div class="room-bottom-controls">
-                        <button class="control-btn icon-btn mute-btn" id="mic-toggle-btn" onclick="toggleMic()"
-                            title="Turn off microphone">
-                            <span class="material-symbols-outlined ctrl-icon">mic</span>
-                        </button>
+                    <div class="room-bottom-controls" style="justify-content: flex-start;">
                         <button class="control-btn leave-room-btn" onclick="window.location.href='tables.html'"
                             title="Leave room">
                             <span class="material-symbols-outlined ctrl-icon">call_end</span> Leave
@@ -161,18 +115,18 @@
                 </div>
 
                 <!-- Right Side: Chat Panel -->
-                <div class="chat-panel" id="chat-panel">
+                <div class="chat-panel" id="chat-panel"
+                    style="position: relative; right: auto; transform: none; box-shadow: none; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; height: 600px; flex: 1; min-width: 350px;">
                     <div class="chat-header">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <h3>Room Chat</h3>
-                            <span class="chat-count">12 online</span>
+                            <span class="chat-count">6 members</span>
                         </div>
-                        <button class="close-chat-btn" onclick="toggleChat()">✕</button>
                     </div>
 
                     <div class="chat-messages" id="chat-messages">
                         <div class="message system-message">
-                            You joined the room. Welcome to Digital Burnout.
+                            You joined the room. Welcome to Quiet Reflection.
                         </div>
                         <div class="message user-message">
                             <span class="msg-author">Ashley</span>

@@ -15,13 +15,17 @@
 }
 
 .tables-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-items: stretch;
 }
 
 .table-card {
     cursor: pointer;
     background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 270px;
 }
 
 .table-card:hover {
@@ -50,6 +54,9 @@
     margin-top: 5px;
     margin-bottom: 20px;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    min-height: 20px;
 }
 
 .table-stats {
@@ -59,4 +66,25 @@
     color: var(--text-secondary);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 15px;
+    margin-top: auto;
+}
+
+.join-room-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: rgba(226, 133, 166, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(226, 133, 166, 0.2);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.table-card:hover .join-room-btn {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(226, 133, 166, 0.3);
 }
