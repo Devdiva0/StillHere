@@ -1,0 +1,211 @@
+/* ============================
+   MOMENTS & FEED LAYOUT
+=============================== */
+
+.moments-container {
+    max-width: 650px;
+    margin: 150px auto 100px;
+    padding: 0 5%;
+}
+
+.moments-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.moments-header h2 {
+    font-size: 2.8rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.moments-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.compose-box {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 25px;
+    padding: 25px;
+    margin-bottom: 45px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.compose-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 15px 50px rgba(226, 133, 166, 0.15);
+    /* Midnight rose glow */
+}
+
+.compose-box textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    resize: none;
+    outline: none;
+    min-height: 80px;
+}
+
+.compose-box textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.compose-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.compose-btn {
+    padding: 10px 30px;
+    border-radius: 30px;
+    border: none;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.compose-btn:hover {
+    background: #f0a8c2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(226, 133, 166, 0.2);
+}
+
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.post-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 25px;
+    padding: 28px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.post-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.post-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.post-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.post-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.post-content {
+    font-size: 15.5px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-weight: 400;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 18px;
+}
+
+.support-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.support-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+/* Beautiful custom active state for the Midnight Rose pink logic */
+.support-btn.supported {
+    color: var(--accent);
+    background: rgba(226, 133, 166, 0.1);
+    /* Soft rosy fill */
+    border: 1px solid rgba(226, 133, 166, 0.2);
+    box-shadow: 0 4px 15px rgba(226, 133, 166, 0.05);
+}
+
+.support-btn .icon {
+    font-size: 18px;
+    filter: saturate(0) opacity(0.5);
+    /* Desaturated initially */
+    transition: var(--transition);
+}
+
+.support-btn:hover .icon {
+    filter: saturate(0.5) opacity(0.8);
+}
+
+.support-btn.supported .icon {
+    filter: saturate(1) opacity(1);
+    /* Full color beautiful blossom */
+    transform: scale(1.1);
+}
+
+.support-count {
+    opacity: 0.7;
+    margin-left: 2px;
+}
