@@ -48,6 +48,100 @@ if (primaryBtn) {
     });
 }
 
+// Toggle Support (Flower/Thumbs up)
+window.toggleSupport = (btn, initialCount) => {
+    const isSupported = btn.classList.toggle('supported');
+    const countSpan = btn.querySelector('.support-count');
+    const textSpan = btn.querySelector('.support-text');
+
+    let currentCount = parseInt(countSpan.textContent.replace('・ ', '')) || initialCount;
+
+    if (isSupported) {
+        currentCount++;
+        textSpan.textContent = 'Supported';
+    } else {
+        currentCount--;
+        textSpan.textContent = 'Support';
+    }
+
+    countSpan.textContent = `・ ${currentCount}`;
+};
+
+// Infinite Scroll for Home Feed
+const homeFeed = document.getElementById('home-moments-feed');
+const sentinel = document.getElementById('infinite-scroll-sentinel');
+
+if (homeFeed && sentinel) {
+    let postPageIndex = 0;
+    const mockPosts = [
+        { name: "Leo", time: "2h ago", avatar: "🦁", color: "#f5a88c", text: "Found a quiet spot by the lake today. No noise, just the sound of water.", count: 12, media: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800" },
+        { name: "Cyan", time: "4h ago", avatar: "🌊", color: "#85c1e2", text: "The internet feels heavy today. Glad this space exists to just... breathe.", count: 8 },
+        { name: "Amber", time: "6h ago", avatar: "🕯️", color: "#f5d38c", text: "Midnight tea and a good book. Sometimes the simplest moments are the most profound.", count: 24, media: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800" },
+        { name: "Jade", time: "1d ago", avatar: "🌿", color: "#85e2a6", text: "Started a small garden on my balcony. Watching things grow slowly is soul-healing.", count: 15 },
+        { name: "Luna", time: "1d ago", avatar: "🌙", color: "#a685e2", text: "The moon is beautiful tonight. Staring at the stars makes all the digital noise feel so small.", count: 42, media: "https://images.unsplash.com/photo-1507499739999-097706ad8914?auto=format&fit=crop&q=80&w=800" }
+    ];
+
+    const loadMorePosts = () => {
+        // Simulate loading state
+        const loader = document.createElement('div');
+        loader.className = 'post-card reveal active';
+        loader.style.textAlign = 'center';
+        loader.style.padding = '20px';
+        loader.innerHTML = `<p style="color: var(--text-secondary); opacity: 0.5;">Finding more quiet moments...</p>`;
+        homeFeed.appendChild(loader);
+
+        setTimeout(() => {
+            if (homeFeed.contains(loader)) homeFeed.removeChild(loader);
+
+            // Add 2 random posts from mock data
+            for (let i = 0; i < 2; i++) {
+                const postData = mockPosts[Math.floor(Math.random() * mockPosts.length)];
+                const post = document.createElement('div');
+                post.className = 'post-card reveal active';
+
+                let mediaHtml = '';
+                if (postData.media) {
+                    mediaHtml = `
+                        <div class="post-media-container">
+                            <img class="post-media-content" src="${postData.media}" alt="Serene moment">
+                        </div>
+                    `;
+                }
+
+                post.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar" style="background: ${postData.color};">${postData.avatar}</div>
+                        <div class="post-info">
+                            <span class="post-name">${postData.name}</span>
+                            <span class="post-time">${postData.time}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p class="post-text">${postData.text}</p>
+                        ${mediaHtml}
+                    </div>
+                    <div class="post-actions">
+                        <button class="support-btn" onclick="toggleSupport(this, ${postData.count})">
+                            <span class="icon">👍</span>
+                            <span class="support-text">Support</span>
+                            <span class="support-count">・ ${postData.count}</span>
+                        </button>
+                    </div>
+                `;
+                homeFeed.appendChild(post);
+            }
+        }, 800);
+    };
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            loadMorePosts();
+        }
+    }, { threshold: 0.1 });
+
+    scrollObserver.observe(sentinel);
+}
+
 // Scroll Reveal Animations
 const revealElements = document.querySelectorAll(".reveal, .reveal-stagger");
 

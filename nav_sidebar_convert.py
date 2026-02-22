@@ -1,7 +1,7 @@
 import os
 import re
 
-files_to_update = ['index.html', 'join.html', 'problem.html', 'solution.html', 'tables.html', 'profile.html', 'moments.html']
+files_to_update = ['index.html', 'join.html', 'problem.html', 'solution.html', 'tables.html', 'profile.html', 'moments.html', 'about.html']
 
 def generate_sidebar(active_page):
     def is_active(page):
@@ -26,6 +26,7 @@ def generate_sidebar(active_page):
                 <div class="nav-avatar" style="background: #39b59e;">🦊</div>
                 <span class="nav-label">Profile</span>
             </a>
+            <a href="about.html" class="nav-item {is_active('About')}"><span class="material-symbols-outlined">info</span> <span class="nav-label">About</span></a>
         </nav>
     </aside>'''
 
@@ -36,7 +37,8 @@ active_map = {
     'tables.html': 'Tables',
     'moments.html': 'Moments',
     'join.html': 'Join',
-    'profile.html': 'Profile'
+    'profile.html': 'Profile',
+    'about.html': 'About'
 }
 
 for filename in files_to_update:
