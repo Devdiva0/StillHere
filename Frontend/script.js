@@ -1,3 +1,80 @@
+// Check authentication
+const token = localStorage.getItem('stillhere_token');
+const user = JSON.parse(localStorage.getItem('stillhere_user'));
+const isAuthPage = window.location.pathname.includes('auth.html');
+
+if (!token && !isAuthPage) {
+    window.location.href = 'auth.html';
+}
+
+if (token && isAuthPage) {
+    window.location.href = 'index.html';
+}
+
+// Update UI with user data
+if (user) {
+    const avatarEls = document.querySelectorAll('.nav-avatar');
+    avatarEls.forEach(el => {
+        el.textContent = user.avatar;
+        el.style.background = user.color;
+    });
+
+    // Profile Page Population
+    const profileName = document.getElementById('user-profile-name');
+    const profileUsername = document.getElementById('user-profile-username');
+    const profileAvatar = document.getElementById('user-profile-avatar');
+    const profileEmoji = document.getElementById('user-profile-emoji');
+
+    if (profileName) {
+        profileName.textContent = user.username;
+        profileUsername.textContent = `@${user.username.toLowerCase().replace(/\s+/g, '_')}`;
+        profileAvatar.style.background = user.color;
+        profileEmoji.textContent = user.avatar;
+
+        // Load user's moments
+        const loadUserMoments = async () => {
+            const feed = document.getElementById('user-moments-feed');
+            if (!feed) return;
+
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/api/posts/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const posts = await response.json();
+
+                if (posts.length === 0) {
+                    feed.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">You haven\'t shared any moments yet.</p>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    feed.appendChild(window.createPostElement(post));
+                });
+            } catch (err) {
+                console.error("Failed to load your moments", err);
+            }
+        };
+        loadUserMoments();
+    }
+}
+
+window.logout = () => {
+    localStorage.removeItem('stillhere_token');
+    localStorage.removeItem('stillhere_user');
+    window.location.href = 'auth.html';
+};
+
+// Inject logout button if not present
+const navBottom = document.querySelector('.nav-bottom');
+if (navBottom && !document.querySelector('[onclick="logout()"]')) {
+    const logoutBtn = document.createElement('a');
+    logoutBtn.href = '#';
+    logoutBtn.className = 'nav-item';
+    logoutBtn.onclick = (e) => { e.preventDefault(); logout(); };
+    logoutBtn.innerHTML = '<span class="material-symbols-outlined">logout</span> <span class="nav-label">Logout</span>';
+    navBottom.appendChild(logoutBtn);
+}
+
 // "Join Waitlist" secondary button in hero goes to join page
 const joinBtn = document.getElementById("join-btn");
 if (joinBtn) {
@@ -135,9 +212,6 @@ window.submitModalPost = async () => {
     if (!text && !modalMediaData) return;
 
     const newPostData = {
-        name: "Fox",
-        avatar: "🦊",
-        color: "#39b59e",
         text: text,
         media: modalMediaData ? modalMediaData.url : null,
         mediaType: modalMediaData ? modalMediaData.type : null
@@ -146,7 +220,10 @@ window.submitModalPost = async () => {
     try {
         const response = await fetch(`${CONFIG.API_URL}/api/posts`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('stillhere_token')}`
+            },
             body: JSON.stringify(newPostData)
         });
 
@@ -158,6 +235,10 @@ window.submitModalPost = async () => {
             }
             closeShareModal();
             alert("Moment shared to the quiet.");
+        } else {
+            alert("Failed to share moment. Please log in again.");
+            localStorage.removeItem('stillhere_token');
+            window.location.href = 'auth.html';
         }
     } catch (err) {
         alert("Failed to share moment. Server offline?");
@@ -185,12 +266,23 @@ window.createPostElement = (postData) => {
         }
     }
 
+    const formatTime = (dateInput) => {
+        if (!dateInput) return 'Just now';
+        const date = new Date(dateInput);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        return date.toLocaleDateString();
+    };
+
     post.innerHTML = `
         <div class="post-header">
             <div class="post-avatar" style="background: ${postData.color};">${postData.avatar}</div>
             <div class="post-info">
                 <span class="post-name">${postData.name}</span>
-                <span class="post-time">${postData.time}</span>
+                <span class="post-time">${formatTime(postData.createdAt || postData.time)}</span>
             </div>
         </div>
         <div class="post-content">
