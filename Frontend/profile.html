@@ -97,13 +97,13 @@
 
             <div class="profile-content">
                 <div class="profile-avatar-wrapper">
-                    <div class="profile-avatar" style="background: #39b59e;">
-                        <span class="avatar-emoji">🦊</span>
+                    <div class="profile-avatar" id="user-profile-avatar" style="background: #39b59e;">
+                        <span class="avatar-emoji" id="user-profile-emoji">🦊</span>
                     </div>
                 </div>
 
-                <h2 class="profile-name">Fox</h2>
-                <p class="profile-username">@quiet_fox</p>
+                <h2 class="profile-name" id="user-profile-name">Fox</h2>
+                <p class="profile-username" id="user-profile-username">@quiet_fox</p>
 
                 <p class="profile-bio">
                     Finding calm in the noise. Slowly building a digital sanctuary.
@@ -127,14 +127,22 @@
 
                 <div class="profile-actions">
                     <button class="primary-btn">Edit Profile</button>
-                    <button class="secondary-btn">Sign Out</button>
+                    <button class="secondary-btn" onclick="logout()">Sign Out</button>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- User's Moments -->
+    <section class="section reveal user-moments-section" style="margin-top: 40px;">
+        <h3 style="margin-bottom: 20px; font-family: 'Inter'; font-weight: 500;">Your Moments</h3>
+        <div id="user-moments-feed" class="moments-feed">
+            <!-- Dynamically populated -->
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer style="position: absolute; bottom: 0; width: 100%;">
+    <footer style="margin-top: 80px; padding-bottom: 40px;">
         <p>© 2026 StillHere</p>
         <p>We are still here with you.</p>
     </footer>
