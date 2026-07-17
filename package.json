@@ -4,6 +4,7 @@
   "description": "Root package for StillHere project",
   "scripts": {
     "install:backend": "cd Backend && npm install",
+    "start:backend": "node Backend/server.js",
     "dev:backend": "cd Backend && npm run dev",
     "dev:frontend": "cd Frontend && npx serve",
     "dev": "npm run install:backend && npm run dev:backend"
