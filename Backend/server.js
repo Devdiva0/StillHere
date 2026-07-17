@@ -48,12 +48,19 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Could not connect to MongoDB:', err.message));
+const MONGODB_URI = process.env.MONGODB_URI;
+if (MONGODB_URI) {
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log('Connected to MongoDB'))
+        .catch(err => console.error('Could not connect to MongoDB:', err.message));
+} else {
+    console.log('No MONGODB_URI found. Running in-memory database fallback.');
+}
 
 // Disable operation buffering so that operations fail immediately if not connected
 mongoose.set('bufferCommands', false);
+
+const JWT_SECRET = process.env.JWT_SECRET || 'stillhere_secret_key_123';
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {
@@ -61,7 +68,7 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Access denied' });
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
         req.user = user;
         next();
@@ -91,7 +98,7 @@ app.post('/api/auth/signup', async (req, res) => {
             const user = new User({ username, email, password });
             await user.save();
 
-            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
             res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
         } else {
             const existingUser = memoryDB.users.find(u => u.email === email || u.username === username);
@@ -117,7 +124,7 @@ app.post('/api/auth/signup', async (req, res) => {
             };
             memoryDB.users.push(user);
 
-            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
             res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
         }
     } catch (err) {
@@ -136,7 +143,7 @@ app.post('/api/auth/login', async (req, res) => {
             const isMatch = await user.comparePassword(password);
             if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
             res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
         } else {
             const user = memoryDB.users.find(u => u.email === email);
@@ -146,7 +153,7 @@ app.post('/api/auth/login', async (req, res) => {
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
             res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
         }
     } catch (err) {
