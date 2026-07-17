@@ -62,7 +62,7 @@ app.post('/api/auth/signup', async (req, res) => {
         res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
     } catch (err) {
         console.error('Signup Error:', err);
-        res.status(500).json({ error: 'Server error', message: err.message });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -78,7 +78,7 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -87,7 +87,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
         const user = await User.findById(req.user.id).select('-password');
         res.json(user);
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -106,7 +106,7 @@ app.post('/api/waitlist', async (req, res) => {
         await newEntry.save();
         res.status(201).json({ message: 'Added to waitlist' });
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -116,7 +116,7 @@ app.get('/api/posts', async (req, res) => {
         const posts = await Post.find().sort({ createdAt: -1 });
         res.json(posts);
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -139,7 +139,7 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
         res.status(201).json(newPost);
     } catch (err) {
         console.error('Create Post Error:', err);
-        res.status(500).json({ error: 'Server error', message: err.message });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
@@ -149,7 +149,7 @@ app.get('/api/posts/me', authenticateToken, async (req, res) => {
         const posts = await Post.find({ name: user.username }).sort({ createdAt: -1 });
         res.json(posts);
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
 
