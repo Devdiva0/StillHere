@@ -1,3 +1,6 @@
 const CONFIG = {
-    API_URL: 'http://127.0.0.1:6005'
+    API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://127.0.0.1:6005'
+        : window.location.origin
 };
+
