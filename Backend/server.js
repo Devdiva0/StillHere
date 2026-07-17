@@ -10,6 +10,38 @@ const Post = require('./models/Post');
 const Waitlist = require('./models/Waitlist');
 const User = require('./models/User');
 
+// In-Memory Database Fallback Store
+const memoryDB = {
+    users: [],
+    posts: [
+        {
+            _id: "m1",
+            name: "Leo",
+            avatar: "🦁",
+            color: "#f5a88c",
+            text: "Found a quiet spot by the lake today. No noise, just the sound of water.",
+            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+        },
+        {
+            _id: "m2",
+            name: "Cyan",
+            avatar: "🌊",
+            color: "#85c1e2",
+            text: "The internet feels heavy today. Glad this space exists to just... breathe.",
+            createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
+        },
+        {
+            _id: "m3",
+            name: "Amber",
+            avatar: "🕯️",
+            color: "#f5d38c",
+            text: "Midnight tea and a good book. Sometimes the simplest moments are the most profound.",
+            createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000)
+        }
+    ],
+    waitlist: []
+};
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -52,14 +84,42 @@ app.get('/', (req, res) => {
 app.post('/api/auth/signup', async (req, res) => {
     const { username, email, password } = req.body;
     try {
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) return res.status(400).json({ error: 'User already exists' });
+        if (mongoose.connection.readyState === 1) {
+            const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+            if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-        const user = new User({ username, email, password });
-        await user.save();
+            const user = new User({ username, email, password });
+            await user.save();
 
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+        } else {
+            const existingUser = memoryDB.users.find(u => u.email === email || u.username === username);
+            if (existingUser) return res.status(400).json({ error: 'User already exists' });
+
+            const bcrypt = require('bcryptjs');
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            const avatars = ['🦊', '🐰', '🦁', '🐢', '🕊️', '🌿', '🌙', '🌊', '🕯️', '🌸', '✨'];
+            const colors = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
+            const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+            const user = {
+                _id: String(memoryDB.users.length + 1),
+                username,
+                email,
+                password: hashedPassword,
+                avatar: randomAvatar,
+                color: randomColor,
+                createdAt: new Date()
+            };
+            memoryDB.users.push(user);
+
+            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+        }
     } catch (err) {
         console.error('Signup Error:', err);
         res.status(500).json({ error: `Server error: ${err.message}` });
@@ -69,14 +129,26 @@ app.post('/api/auth/signup', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+        if (mongoose.connection.readyState === 1) {
+            const user = await User.findOne({ email });
+            if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+            const isMatch = await user.comparePassword(password);
+            if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+        } else {
+            const user = memoryDB.users.find(u => u.email === email);
+            if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+            const bcrypt = require('bcryptjs');
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+
+            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+        }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
     }
@@ -84,8 +156,15 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
-        res.json(user);
+        if (mongoose.connection.readyState === 1) {
+            const user = await User.findById(req.user.id).select('-password');
+            res.json(user);
+        } else {
+            const user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+            const { password, ...userWithoutPassword } = user;
+            res.json(userWithoutPassword);
+        }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
     }
@@ -97,14 +176,24 @@ app.post('/api/waitlist', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     try {
-        const existing = await Waitlist.findOne({ email });
-        if (existing) {
-            return res.status(400).json({ error: 'Email already in list' });
-        }
+        if (mongoose.connection.readyState === 1) {
+            const existing = await Waitlist.findOne({ email });
+            if (existing) {
+                return res.status(400).json({ error: 'Email already in list' });
+            }
 
-        const newEntry = new Waitlist({ email });
-        await newEntry.save();
-        res.status(201).json({ message: 'Added to waitlist' });
+            const newEntry = new Waitlist({ email });
+            await newEntry.save();
+            res.status(201).json({ message: 'Added to waitlist' });
+        } else {
+            const existing = memoryDB.waitlist.find(w => w.email === email);
+            if (existing) {
+                return res.status(400).json({ error: 'Email already in list' });
+            }
+
+            memoryDB.waitlist.push({ email, createdAt: new Date() });
+            res.status(201).json({ message: 'Added to waitlist' });
+        }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
     }
@@ -113,8 +202,13 @@ app.post('/api/waitlist', async (req, res) => {
 // --- MOMENTS (POSTS) API ---
 app.get('/api/posts', async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 });
-        res.json(posts);
+        if (mongoose.connection.readyState === 1) {
+            const posts = await Post.find().sort({ createdAt: -1 });
+            res.json(posts);
+        } else {
+            const sortedPosts = [...memoryDB.posts].sort((a, b) => b.createdAt - a.createdAt);
+            res.json(sortedPosts);
+        }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
     }
@@ -124,19 +218,37 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const { text, media, mediaType } = req.body;
 
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (mongoose.connection.readyState === 1) {
+            const user = await User.findById(req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
 
-        const newPost = new Post({
-            name: user.username,
-            avatar: user.avatar,
-            color: user.color,
-            text,
-            media,
-            mediaType
-        });
-        await newPost.save();
-        res.status(201).json(newPost);
+            const newPost = new Post({
+                name: user.username,
+                avatar: user.avatar,
+                color: user.color,
+                text,
+                media,
+                mediaType
+            });
+            await newPost.save();
+            res.status(201).json(newPost);
+        } else {
+            const user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            const newPost = {
+                _id: String(memoryDB.posts.length + 1),
+                name: user.username,
+                avatar: user.avatar,
+                color: user.color,
+                text,
+                media,
+                mediaType,
+                createdAt: new Date()
+            };
+            memoryDB.posts.push(newPost);
+            res.status(201).json(newPost);
+        }
     } catch (err) {
         console.error('Create Post Error:', err);
         res.status(500).json({ error: `Server error: ${err.message}` });
@@ -145,13 +257,23 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
 
 app.get('/api/posts/me', authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        const posts = await Post.find({ name: user.username }).sort({ createdAt: -1 });
-        res.json(posts);
+        if (mongoose.connection.readyState === 1) {
+            const user = await User.findById(req.user.id);
+            const posts = await Post.find({ name: user.username }).sort({ createdAt: -1 });
+            res.json(posts);
+        } else {
+            const user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            const posts = memoryDB.posts.filter(p => p.name === user.username)
+                .sort((a, b) => b.createdAt - a.createdAt);
+            res.json(posts);
+        }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
     }
 });
+
 
 // --- SOCKET.IO ---
 io.on('connection', (socket) => {

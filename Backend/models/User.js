@@ -5,8 +5,14 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    avatar: { type: String, default: '👤' },
-    color: { type: String, default: '#39b59e' },
+    avatar: { type: String, default: () => {
+        const list = ['🦊', '🐰', '🦁', '🐢', '🕊️', '🌿', '🌙', '🌊', '🕯️', '🌸', '✨'];
+        return list[Math.floor(Math.random() * list.length)];
+    }},
+    color: { type: String, default: () => {
+        const list = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
+        return list[Math.floor(Math.random() * list.length)];
+    }},
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -22,3 +28,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 module.exports = mongoose.model('User', userSchema);
+
