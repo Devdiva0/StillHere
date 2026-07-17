@@ -1,0 +1,11 @@
+{
+  "name": "stillhere-root",
+  "version": "1.0.0",
+  "description": "Root package for StillHere project",
+  "scripts": {
+    "install:backend": "cd Backend && npm install",
+    "dev:backend": "cd Backend && npm run dev",
+    "dev:frontend": "cd Frontend && npx serve",
+    "dev": "npm run install:backend && npm run dev:backend"
+  }
+}
