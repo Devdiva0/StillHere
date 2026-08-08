@@ -14,32 +14,7 @@ const Table = require('./models/Table');
 // In-Memory Database Fallback Store
 const memoryDB = {
     users: [],
-    posts: [
-        {
-            _id: "m1",
-            name: "Leo",
-            avatar: "🦁",
-            color: "#f5a88c",
-            text: "Found a quiet spot by the lake today. No noise, just the sound of water.",
-            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-        },
-        {
-            _id: "m2",
-            name: "Cyan",
-            avatar: "🌊",
-            color: "#85c1e2",
-            text: "The internet feels heavy today. Glad this space exists to just... breathe.",
-            createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
-        },
-        {
-            _id: "m3",
-            name: "Amber",
-            avatar: "🕯️",
-            color: "#f5d38c",
-            text: "Midnight tea and a good book. Sometimes the simplest moments are the most profound.",
-            createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000)
-        }
-    ],
+    posts: [],
     waitlist: [],
     tables: []
 };
