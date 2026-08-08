@@ -268,12 +268,25 @@ window.submitModalPost = async () => {
 
         if (response.ok) {
             const savedPost = await response.json();
+
+            // Prepend to home feed if visible
             const homeFeed = document.getElementById('home-moments-feed');
-            if (homeFeed && typeof createPostElement === 'function') {
-                homeFeed.insertBefore(createPostElement(savedPost), homeFeed.firstChild);
+            if (homeFeed) {
+                const emptyState = homeFeed.querySelector('div[style*="text-align:center"]');
+                if (emptyState) homeFeed.removeChild(emptyState);
+                homeFeed.insertBefore(window.createPostElement(savedPost), homeFeed.firstChild);
             }
+
+            // Prepend to user profile moments feed if on profile page
+            const userFeed = document.getElementById('user-moments-feed');
+            if (userFeed) {
+                const emptyMsg = userFeed.querySelector('p');
+                if (emptyMsg) userFeed.removeChild(emptyMsg);
+                userFeed.insertBefore(window.createPostElement(savedPost), userFeed.firstChild);
+            }
+
             closeShareModal();
-            alert("Moment shared to the quiet.");
+            showToast("Moment shared to the quiet.");
         } else {
             alert("Failed to share moment. Please log in again.");
             localStorage.removeItem('stillhere_token');
@@ -765,12 +778,15 @@ if (typeof io !== 'undefined') {
     // Real-time moments/feed post updater
     socket.on('new-post', (postData) => {
         const postId = postData._id || postData.id;
+        const currentUser = JSON.parse(localStorage.getItem('stillhere_user') || 'null');
 
         const insertIntoFeed = (feed) => {
             if (!feed) return;
             // Clear empty-state placeholder if present
             const emptyState = feed.querySelector('div[style*="text-align:center"]');
             if (emptyState) feed.removeChild(emptyState);
+            const emptyMsg = feed.querySelector('p');
+            if (emptyMsg && emptyMsg.textContent.includes("haven\'t")) feed.removeChild(emptyMsg);
             // Avoid duplicates
             if (!feed.querySelector(`[data-id="${postId}"]`)) {
                 feed.insertBefore(window.createPostElement(postData), feed.firstChild);
@@ -779,6 +795,11 @@ if (typeof io !== 'undefined') {
 
         insertIntoFeed(document.getElementById('home-moments-feed'));
         insertIntoFeed(document.getElementById('moments-feed'));
+
+        // Also update profile feed if the post is from the current user
+        if (currentUser && postData.name === currentUser.username) {
+            insertIntoFeed(document.getElementById('user-moments-feed'));
+        }
     });
 }
 
