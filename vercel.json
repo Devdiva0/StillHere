@@ -16,6 +16,22 @@
       "dest": "Backend/server.js"
     },
     {
+      "src": "/room",
+      "dest": "Frontend/room.html"
+    },
+    {
+      "src": "/chat-room",
+      "dest": "Frontend/chat-room.html"
+    },
+    {
+      "src": "/tables",
+      "dest": "Frontend/tables.html"
+    },
+    {
+      "src": "/auth",
+      "dest": "Frontend/auth.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "Frontend/$1"
     }
