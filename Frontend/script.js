@@ -408,74 +408,52 @@ window.deletePost = async (event, postId, btnElement) => {
 const homeFeed = document.getElementById('home-moments-feed');
 const sentinel = document.getElementById('infinite-scroll-sentinel');
 
-if (homeFeed && sentinel) {
-    let postPageIndex = 0;
-    const mockPosts = [
-        { name: "Leo", time: "2h ago", avatar: "🦁", color: "#f5a88c", text: "Found a quiet spot by the lake today. No noise, just the sound of water.", count: 12, media: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800" },
-        { name: "Cyan", time: "4h ago", avatar: "🌊", color: "#85c1e2", text: "The internet feels heavy today. Glad this space exists to just... breathe.", count: 8 },
-        { name: "Amber", time: "6h ago", avatar: "🕯️", color: "#f5d38c", text: "Midnight tea and a good book. Sometimes the simplest moments are the most profound.", count: 24, media: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800" },
-        { name: "Jade", time: "1d ago", avatar: "🌿", color: "#85e2a6", text: "Started a small garden on my balcony. Watching things grow slowly is soul-healing.", count: 15 },
-        { name: "Luna", time: "1d ago", avatar: "🌙", color: "#a685e2", text: "The moon is beautiful tonight. Staring at the stars makes all the digital noise feel so small.", count: 42, media: "https://images.unsplash.com/photo-1507499739999-097706ad8914?auto=format&fit=crop&q=80&w=800" }
-    ];
-
+if (homeFeed) {
     // Load posts from backend
     const loadInitialPosts = async () => {
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/posts`);
+            if (!response.ok) throw new Error('Failed to fetch');
             const posts = await response.json();
-            posts.forEach(postData => {
-                homeFeed.appendChild(window.createPostElement(postData));
-            });
+
+            if (posts.length === 0) {
+                homeFeed.innerHTML = `
+                    <div style="text-align:center; padding: 60px 20px; color: var(--text-secondary); opacity: 0.5;">
+                        <p style="font-size: 32px; margin-bottom: 12px;">🌿</p>
+                        <p style="font-size: 15px;">No moments yet. Be the first to share one.</p>
+                    </div>`;
+            } else {
+                posts.forEach(postData => {
+                    homeFeed.appendChild(window.createPostElement(postData));
+                });
+            }
         } catch (err) {
             console.error("Failed to load posts", err);
         }
     };
     loadInitialPosts();
-
-    const loadMorePosts = () => {
-        // Simulate loading state
-        const loader = document.createElement('div');
-        loader.className = 'post-card reveal active';
-        loader.style.textAlign = 'center';
-        loader.style.padding = '20px';
-        loader.innerHTML = `<p style="color: var(--text-secondary); opacity: 0.5;">Finding more quiet moments...</p>`;
-        homeFeed.appendChild(loader);
-
-        setTimeout(() => {
-            if (homeFeed.contains(loader)) homeFeed.removeChild(loader);
-
-            // Add 2 random posts from mock data
-            for (let i = 0; i < 2; i++) {
-                const postData = mockPosts[Math.floor(Math.random() * mockPosts.length)];
-                homeFeed.appendChild(window.createPostElement(postData));
-            }
-        }, 800);
-    };
-
-    const scrollObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            loadMorePosts();
-        }
-    }, { threshold: 0.1 });
-
-    scrollObserver.observe(sentinel);
 }
 
 // Share page moments feed logic
 const momentsFeed = document.getElementById('moments-feed');
 if (momentsFeed) {
-    // Clear static mock posts
-    momentsFeed.innerHTML = '';
-
     // Load initial posts from backend
     const loadSharePagePosts = async () => {
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/posts`);
             if (response.ok) {
                 const posts = await response.json();
-                posts.forEach(postData => {
-                    momentsFeed.appendChild(window.createPostElement(postData));
-                });
+                if (posts.length === 0) {
+                    momentsFeed.innerHTML = `
+                        <div style="text-align:center; padding: 60px 20px; color: var(--text-secondary); opacity: 0.5;">
+                            <p style="font-size: 32px; margin-bottom: 12px;">🌿</p>
+                            <p style="font-size: 15px;">No moments yet. Be the first to share one above.</p>
+                        </div>`;
+                } else {
+                    posts.forEach(postData => {
+                        momentsFeed.appendChild(window.createPostElement(postData));
+                    });
+                }
             }
         } catch (err) {
             console.error("Failed to load posts in share feed", err);
@@ -787,24 +765,20 @@ if (typeof io !== 'undefined') {
     // Real-time moments/feed post updater
     socket.on('new-post', (postData) => {
         const postId = postData._id || postData.id;
-        
-        // Prepend to index.html feed if we are on the home page
-        const homeFeed = document.getElementById('home-moments-feed');
-        if (homeFeed) {
-            const postExists = !!homeFeed.querySelector(`[data-id="${postId}"]`);
-            if (!postExists) {
-                homeFeed.insertBefore(window.createPostElement(postData), homeFeed.firstChild);
-            }
-        }
 
-        // Prepend to share.html feed if we are on the share page
-        const momentsFeed = document.getElementById('moments-feed');
-        if (momentsFeed) {
-            const postExists = !!momentsFeed.querySelector(`[data-id="${postId}"]`);
-            if (!postExists) {
-                momentsFeed.insertBefore(window.createPostElement(postData), momentsFeed.firstChild);
+        const insertIntoFeed = (feed) => {
+            if (!feed) return;
+            // Clear empty-state placeholder if present
+            const emptyState = feed.querySelector('div[style*="text-align:center"]');
+            if (emptyState) feed.removeChild(emptyState);
+            // Avoid duplicates
+            if (!feed.querySelector(`[data-id="${postId}"]`)) {
+                feed.insertBefore(window.createPostElement(postData), feed.firstChild);
             }
-        }
+        };
+
+        insertIntoFeed(document.getElementById('home-moments-feed'));
+        insertIntoFeed(document.getElementById('moments-feed'));
     });
 }
 
