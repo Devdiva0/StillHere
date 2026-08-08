@@ -63,12 +63,49 @@ if (user) {
     const profileUsername = document.getElementById('user-profile-username');
     const profileAvatar = document.getElementById('user-profile-avatar');
     const profileEmoji = document.getElementById('user-profile-emoji');
+    const profileBio = document.getElementById('user-profile-bio');
+    const hoursListenedSpan = document.getElementById('user-hours-listened');
+    const tablesJoinedSpan = document.getElementById('user-tables-joined');
+    const languagesSpan = document.getElementById('user-languages');
 
     if (profileName) {
-        profileName.textContent = user.username;
-        profileUsername.textContent = `@${user.username.toLowerCase().replace(/\s+/g, '_')}`;
-        profileAvatar.style.background = user.color;
-        profileEmoji.textContent = user.avatar;
+        // Fetch fresh details from database
+        const loadFreshUserProfile = async () => {
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const freshUser = await response.json();
+                    
+                    // Update safeStorage to keep it in sync
+                    localStorage.setItem('stillhere_user', JSON.stringify(freshUser));
+                    
+                    // Render details
+                    profileName.textContent = freshUser.username;
+                    profileUsername.textContent = `@${freshUser.username.toLowerCase().replace(/\s+/g, '_')}`;
+                    profileAvatar.style.background = freshUser.color || '#39b59e';
+                    profileEmoji.textContent = freshUser.avatar || '🦊';
+                    
+                    if (profileBio) {
+                        profileBio.textContent = freshUser.bio || 'Finding calm in the noise. Slowly building a digital sanctuary.';
+                    }
+                    if (hoursListenedSpan) {
+                        const hrs = freshUser.hoursListened || 0;
+                        hoursListenedSpan.textContent = hrs >= 1 ? Math.round(hrs) : hrs.toFixed(1);
+                    }
+                    if (tablesJoinedSpan) {
+                        tablesJoinedSpan.textContent = freshUser.tablesJoined || 0;
+                    }
+                    if (languagesSpan) {
+                        languagesSpan.textContent = freshUser.languages || 'KO, EN';
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load fresh user profile", err);
+            }
+        };
+        loadFreshUserProfile();
 
         // Load user's moments
         const loadUserMoments = async () => {
@@ -96,6 +133,68 @@ if (user) {
         loadUserMoments();
     }
 }
+
+// Edit Profile Modal Controllers
+window.openEditProfileModal = () => {
+    const modal = document.getElementById('edit-profile-modal-overlay');
+    if (!modal) return;
+
+    const currentUser = JSON.parse(localStorage.getItem('stillhere_user') || '{}');
+    
+    // Pre-populate input fields
+    document.getElementById('edit-username-input').value = currentUser.username || '';
+    document.getElementById('edit-bio-input').value = currentUser.bio || '';
+    document.getElementById('edit-languages-input').value = currentUser.languages || '';
+    document.getElementById('edit-avatar-input').value = currentUser.avatar || '';
+    document.getElementById('edit-color-input').value = currentUser.color || '#39b59e';
+
+    modal.classList.add('active');
+};
+
+window.closeEditProfileModal = (event) => {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('edit-profile-modal-overlay');
+    if (modal) modal.classList.remove('active');
+};
+
+window.saveProfileChanges = async () => {
+    const username = document.getElementById('edit-username-input').value.trim();
+    const bio = document.getElementById('edit-bio-input').value.trim();
+    const languages = document.getElementById('edit-languages-input').value.trim();
+    const avatar = document.getElementById('edit-avatar-input').value.trim();
+    const color = document.getElementById('edit-color-input').value;
+
+    if (!username) {
+        alert("Username is required.");
+        return;
+    }
+
+    const token = safeStorage.getItem('stillhere_token');
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/api/auth/me`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ username, bio, languages, avatar, color })
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            localStorage.setItem('stillhere_user', JSON.stringify(updatedUser));
+            
+            // Reload page to reflect changes cleanly
+            window.location.reload();
+        } else {
+            const err = await response.json();
+            alert(err.error || "Failed to update profile.");
+        }
+    } catch (err) {
+        console.error("Save profile error", err);
+        alert("Network error updating profile.");
+    }
+};
 
 window.logout = () => {
     localStorage.removeItem('stillhere_token');
@@ -1087,6 +1186,7 @@ const loadRoomDetails = async () => {
             socket.emit('join-room', {
                 roomId,
                 user: {
+                    id: currentUser ? (currentUser._id || currentUser.id) : null,
                     username: currentUser ? currentUser.username : 'Guest',
                     avatar: currentUser ? currentUser.avatar : '👤',
                     color: currentUser ? currentUser.color : '#ccc',

@@ -76,7 +76,20 @@ app.post('/api/auth/signup', async (req, res) => {
             await user.save();
 
             const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-            res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            res.status(201).json({ 
+                token, 
+                user: { 
+                    id: user._id, 
+                    username: user.username, 
+                    email: user.email, 
+                    avatar: user.avatar, 
+                    color: user.color,
+                    bio: user.bio,
+                    languages: user.languages,
+                    hoursListened: user.hoursListened,
+                    tablesJoined: user.tablesJoined
+                } 
+            });
         } else {
             const existingUser = memoryDB.users.find(u => u.email === email || u.username === username);
             if (existingUser) return res.status(400).json({ error: 'User already exists' });
@@ -97,12 +110,29 @@ app.post('/api/auth/signup', async (req, res) => {
                 password: hashedPassword,
                 avatar: randomAvatar,
                 color: randomColor,
+                bio: 'Finding calm in the noise. Slowly building a digital sanctuary. Happy to just listen, rarely speaking unless asked.',
+                languages: 'KO, EN',
+                hoursListened: 0,
+                tablesJoined: 0,
                 createdAt: new Date()
             };
             memoryDB.users.push(user);
 
             const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-            res.status(201).json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            res.status(201).json({ 
+                token, 
+                user: { 
+                    id: user._id, 
+                    username: user.username, 
+                    email: user.email, 
+                    avatar: user.avatar, 
+                    color: user.color,
+                    bio: user.bio,
+                    languages: user.languages,
+                    hoursListened: user.hoursListened,
+                    tablesJoined: user.tablesJoined
+                } 
+            });
         }
     } catch (err) {
         console.error('Signup Error:', err);
@@ -121,7 +151,20 @@ app.post('/api/auth/login', async (req, res) => {
             if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
             const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-            res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            res.json({ 
+                token, 
+                user: { 
+                    id: user._id, 
+                    username: user.username, 
+                    email: user.email, 
+                    avatar: user.avatar, 
+                    color: user.color,
+                    bio: user.bio,
+                    languages: user.languages,
+                    hoursListened: user.hoursListened,
+                    tablesJoined: user.tablesJoined
+                } 
+            });
         } else {
             const user = memoryDB.users.find(u => u.email === email);
             if (!user) return res.status(400).json({ error: 'Invalid credentials' });
@@ -131,7 +174,20 @@ app.post('/api/auth/login', async (req, res) => {
             if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
             const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
-            res.json({ token, user: { username: user.username, email: user.email, avatar: user.avatar, color: user.color } });
+            res.json({ 
+                token, 
+                user: { 
+                    id: user._id, 
+                    username: user.username, 
+                    email: user.email, 
+                    avatar: user.avatar, 
+                    color: user.color,
+                    bio: user.bio,
+                    languages: user.languages,
+                    hoursListened: user.hoursListened,
+                    tablesJoined: user.tablesJoined
+                } 
+            });
         }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
@@ -514,6 +570,69 @@ async function endRoom(roomId) {
 }
 
 // --- SOCKET.IO ---
+app.put('/api/auth/me', authenticateToken, async (req, res) => {
+    const { username, bio, languages, avatar, color } = req.body;
+    try {
+        if (mongoose.connection.readyState === 1) {
+            const updateFields = {};
+            if (username !== undefined) updateFields.username = username;
+            if (bio !== undefined) updateFields.bio = bio;
+            if (languages !== undefined) updateFields.languages = languages;
+            if (avatar !== undefined) updateFields.avatar = avatar;
+            if (color !== undefined) updateFields.color = color;
+
+            if (username) {
+                const existing = await User.findOne({ username, _id: { $ne: req.user.id } });
+                if (existing) return res.status(400).json({ error: 'Username already taken' });
+            }
+
+            const user = await User.findByIdAndUpdate(req.user.id, { $set: updateFields }, { new: true }).select('-password');
+            res.json(user);
+        } else {
+            const user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            if (username) {
+                const existing = memoryDB.users.find(u => u.username === username && u._id !== req.user.id);
+                if (existing) return res.status(400).json({ error: 'Username already taken' });
+            }
+
+            if (username !== undefined) user.username = username;
+            if (bio !== undefined) user.bio = bio;
+            if (languages !== undefined) user.languages = languages;
+            if (avatar !== undefined) user.avatar = avatar;
+            if (color !== undefined) user.color = color;
+
+            const { password, ...userWithoutPassword } = user;
+            res.json(userWithoutPassword);
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+const updateHoursListened = async (socket) => {
+    if (socket.joinTime && socket.userId) {
+        const elapsedMs = Date.now() - socket.joinTime;
+        const elapsedHours = elapsedMs / (1000 * 60 * 60);
+        socket.joinTime = null; // Prevent double calculation
+        
+        try {
+            if (mongoose.connection.readyState === 1) {
+                await User.findByIdAndUpdate(socket.userId, { $inc: { hoursListened: elapsedHours } });
+            } else {
+                const u = memoryDB.users.find(x => x._id === socket.userId);
+                if (u) {
+                    u.hoursListened = (u.hoursListened || 0) + elapsedHours;
+                }
+            }
+        } catch (err) {
+            console.error("Error updating hoursListened:", err);
+        }
+    }
+};
+
+// --- SOCKET.IO ---
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
@@ -553,6 +672,23 @@ io.on('connection', (socket) => {
         activeRooms[roomId].push(socket.user);
 
         console.log(`User ${user.username} joined room: ${roomId}`);
+
+        if (user && user.id) {
+            socket.userId = user.id;
+            socket.joinTime = Date.now();
+            
+            // Increment tablesJoined
+            if (mongoose.connection.readyState === 1) {
+                User.findByIdAndUpdate(user.id, { $inc: { tablesJoined: 1 } }).catch(err => {
+                    console.error("Error incrementing tablesJoined:", err);
+                });
+            } else {
+                const u = memoryDB.users.find(x => x._id === user.id);
+                if (u) {
+                    u.tablesJoined = (u.tablesJoined || 0) + 1;
+                }
+            }
+        }
         io.to(roomId).emit('update-participants', activeRooms[roomId]);
     });
 
@@ -643,13 +779,15 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('speaker-demoted', { username });
     });
 
-    socket.on('leave-room', ({ roomId }) => {
+    socket.on('leave-room', async ({ roomId }) => {
         const user = socket.user;
         if (roomId && user && activeRooms[roomId]) {
             console.log(`User ${user.username} explicitly left room: ${roomId}`);
             activeRooms[roomId] = activeRooms[roomId].filter(u => u.socketId !== socket.id);
             io.to(roomId).emit('update-participants', activeRooms[roomId]);
             
+            await updateHoursListened(socket);
+
             const anyAdminLeft = activeRooms[roomId].some(u => u.isAdmin === true);
             if (!anyAdminLeft) {
                 console.log(`Last host explicitly left. Ending room ${roomId} immediately.`);
@@ -665,6 +803,8 @@ io.on('connection', (socket) => {
             io.to(roomId).emit('update-participants', activeRooms[roomId]);
             console.log(`User ${user.username} left room: ${roomId} (disconnect)`);
             
+            await updateHoursListened(socket);
+
             // If there are no admins left, end the room automatically after a grace period (handles page refreshes)
             const anyAdminLeft = activeRooms[roomId].some(u => u.isAdmin === true);
             if (!anyAdminLeft) {
