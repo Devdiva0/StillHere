@@ -36,12 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = document.getElementById('signup-username').value;
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
+        const languages = document.getElementById('signup-languages').value.trim();
+        const avatar = document.getElementById('signup-avatar').value;
+        const color = document.getElementById('signup-color').value;
 
         try {
             const response = await fetch(`${CONFIG.API_URL}/api/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ username, email, password, languages, avatar, color })
             });
 
             const data = await response.json();

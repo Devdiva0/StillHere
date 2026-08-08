@@ -66,13 +66,20 @@ app.get('/', (req, res) => {
 
 // --- AUTH API ---
 app.post('/api/auth/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, languages, avatar, color } = req.body;
     try {
         if (mongoose.connection.readyState === 1) {
             const existingUser = await User.findOne({ $or: [{ email }, { username }] });
             if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-            const user = new User({ username, email, password });
+            const user = new User({ 
+                username, 
+                email, 
+                password, 
+                avatar: avatar || undefined, 
+                color: color || undefined, 
+                languages: languages || undefined 
+            });
             await user.save();
 
             const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
@@ -100,8 +107,9 @@ app.post('/api/auth/signup', async (req, res) => {
 
             const avatars = ['🦊', '🐰', '🦁', '🐢', '🕊️', '🌿', '🌙', '🌊', '🕯️', '🌸', '✨'];
             const colors = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
-            const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomAvatar = avatar || avatars[Math.floor(Math.random() * avatars.length)];
+            const randomColor = color || colors[Math.floor(Math.random() * colors.length)];
+            const finalLanguages = languages || 'KO, EN';
 
             const user = {
                 _id: String(memoryDB.users.length + 1),
@@ -111,7 +119,7 @@ app.post('/api/auth/signup', async (req, res) => {
                 avatar: randomAvatar,
                 color: randomColor,
                 bio: 'Finding calm in the noise. Slowly building a digital sanctuary. Happy to just listen, rarely speaking unless asked.',
-                languages: 'KO, EN',
+                languages: finalLanguages,
                 hoursListened: 0,
                 tablesJoined: 0,
                 createdAt: new Date()
