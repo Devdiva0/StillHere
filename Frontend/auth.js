@@ -27,11 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     showLogin.addEventListener('click', switchToLogin);
-    
-    const showLoginAlt = document.getElementById('show-login-alt');
-    if (showLoginAlt) {
-        showLoginAlt.addEventListener('click', switchToLogin);
-    }
 
     // Signup Onboarding Step Transitions
     const signupNextBtn = document.getElementById('signup-next-btn');
