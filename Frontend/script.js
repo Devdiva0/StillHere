@@ -287,6 +287,7 @@ window.submitModalPost = async () => {
 window.createPostElement = (postData) => {
     const post = document.createElement('div');
     post.className = 'post-card reveal active';
+    post.setAttribute('data-id', postData._id || postData.id || '');
 
     let mediaHtml = '';
     if (postData.media) {
@@ -604,9 +605,11 @@ let socket;
 if (typeof io !== 'undefined') {
     socket = io(CONFIG.API_URL);
 
-    // Socket Connection Status Logger
+    // Socket Connection Status Logger (room pages only)
     socket.on('connect', () => {
         console.log('Socket connected successfully');
+        const isRoomPage = !!document.getElementById('room-name') || !!document.getElementById('chat-messages');
+        if (!isRoomPage) return;
         const statusBox = document.getElementById('socket-status-box') || document.createElement('div');
         statusBox.id = 'socket-status-box';
         statusBox.style.position = 'fixed';
@@ -626,6 +629,8 @@ if (typeof io !== 'undefined') {
 
     socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
+        const isRoomPage = !!document.getElementById('room-name') || !!document.getElementById('chat-messages');
+        if (!isRoomPage) return;
         const statusBox = document.getElementById('socket-error-box') || document.createElement('div');
         statusBox.id = 'socket-error-box';
         statusBox.style.position = 'fixed';
@@ -776,6 +781,29 @@ if (typeof io !== 'undefined') {
             isMuted = true;
             stopMicCapture();
             updateMicBtnUI();
+        }
+    });
+
+    // Real-time moments/feed post updater
+    socket.on('new-post', (postData) => {
+        const postId = postData._id || postData.id;
+        
+        // Prepend to index.html feed if we are on the home page
+        const homeFeed = document.getElementById('home-moments-feed');
+        if (homeFeed) {
+            const postExists = !!homeFeed.querySelector(`[data-id="${postId}"]`);
+            if (!postExists) {
+                homeFeed.insertBefore(window.createPostElement(postData), homeFeed.firstChild);
+            }
+        }
+
+        // Prepend to share.html feed if we are on the share page
+        const momentsFeed = document.getElementById('moments-feed');
+        if (momentsFeed) {
+            const postExists = !!momentsFeed.querySelector(`[data-id="${postId}"]`);
+            if (!postExists) {
+                momentsFeed.insertBefore(window.createPostElement(postData), momentsFeed.firstChild);
+            }
         }
     });
 }

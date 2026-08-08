@@ -240,6 +240,7 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
                 mediaType
             });
             await newPost.save();
+            io.emit('new-post', newPost);
             res.status(201).json(newPost);
         } else {
             let user = memoryDB.users.find(u => u._id === req.user.id);
@@ -266,6 +267,7 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
                 createdAt: new Date()
             };
             memoryDB.posts.push(newPost);
+            io.emit('new-post', newPost);
             res.status(201).json(newPost);
         }
     } catch (err) {
