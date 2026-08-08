@@ -86,6 +86,30 @@
             </div>
         </div>
     </div>
+    <!-- Create Room Modal -->
+    <div class="modal-overlay" id="create-room-modal-overlay" onclick="closeCreateRoomModal(event)">
+        <div class="share-modal" onclick="event.stopPropagation()">
+            <span class="material-symbols-outlined modal-close" onclick="closeCreateRoomModal()">close</span>
+            <div class="share-modal-header">
+                <h2 id="create-room-modal-title">Start a new Room</h2>
+                <p>Create a space for presence, reflection, and connection.</p>
+            </div>
+            <div class="modal-compose-box" style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label for="room-title-input" style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Room Title</label>
+                    <input type="text" id="room-title-input" placeholder="e.g., Morning Coffee, Quiet Book Club, venting space" 
+                        style="width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #fff; padding: 12px; font-size: 16px; outline: none; transition: border-color 0.3s;"
+                        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'">
+                </div>
+                
+                <input type="hidden" id="room-type-input" value="voice">
+
+                <div class="modal-compose-actions" style="border-top: none; margin-top: 0; padding-top: 0; justify-content: flex-end;">
+                    <button class="modal-post-btn" onclick="submitCreateRoom()">Start Room</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Tables Main -->
     <section class="section reveal tables-section" style="margin-top: 100px;">
@@ -104,81 +128,25 @@
         <!-- Voice Rooms Tab -->
         <div id="voice-rooms-tab" class="room-tab-content">
             <div class="tables-header" style="justify-content: flex-end;">
-                <button class="primary-btn" id="create-room-btn">Start a new Room</button>
+                <button class="primary-btn" id="create-room-btn" onclick="openCreateRoomModal('voice')">Start a new Room</button>
             </div>
             <p class="tables-subtitle">Small, quiet audio rooms. Join to listen. Take a chair to speak.</p>
 
-            <div class="cards tables-grid" style="margin-bottom: 60px;">
-                <!-- Table Card 1 -->
-                <div class="card table-card" onclick="window.location.href='room.html'">
-                    <div class="table-card-header">
-                        <h3>Digital Burnout</h3>
-                        <span class="live-badge">Live</span>
-                    </div>
-                    <p class="table-host">Hosted by <strong>Alice</strong></p>
-                    <div class="table-stats">
-                        <span>3/6 Speaking</span>
-                        <span>12 Listening</span>
-                    </div>
-                    <button class="join-room-btn">Join Room</button>
-                </div>
-
-                <!-- Table Card 2 -->
-                <div class="card table-card" onclick="window.location.href='room.html'">
-                    <div class="table-card-header">
-                        <h3>Late Night Thoughts</h3>
-                        <span class="live-badge">Live</span>
-                    </div>
-                    <p class="table-host">Hosted by <strong>Marcus</strong></p>
-                    <div class="table-stats">
-                        <span>6/6 Speaking (Full)</span>
-                        <span>45 Listening</span>
-                    </div>
-                    <button class="join-room-btn">Join Room</button>
-                </div>
-
-                <!-- Table Card 3 -->
-                <div class="card table-card" onclick="window.location.href='room.html'">
-                    <div class="table-card-header">
-                        <h3>Why we are StillHere</h3>
-                        <span class="live-badge">Live</span>
-                    </div>
-                    <p class="table-host">Hosted by <strong>David</strong></p>
-                    <div class="table-stats">
-                        <span>2/6 Speaking</span>
-                        <span>5 Listening</span>
-                    </div>
-                    <button class="join-room-btn">Join Room</button>
-                </div>
+            <div class="cards tables-grid" id="voice-rooms-grid" style="margin-bottom: 60px;">
+                <!-- Voice rooms will load dynamically here -->
             </div>
-        </div>
-
-        </div>
         </div>
 
         <!-- Chat Only Rooms Tab -->
         <div id="chat-rooms-tab" class="room-tab-content" style="display: none;">
             <div class="tables-header" style="justify-content: flex-end;">
-                <button class="primary-btn" id="create-chat-room-btn">Start a Text Room</button>
+                <button class="primary-btn" id="create-chat-room-btn" onclick="openCreateRoomModal('chat')">Start a Text Room</button>
             </div>
             <p class="tables-subtitle">Text-only spaces for shared silence and quiet reflection. No audio.</p>
 
-            <div class="cards tables-grid">
-                <!-- Table Card 4 (Chat Only) -->
-                <div class="card table-card" onclick="window.location.href='chat-room.html'">
-                    <div class="table-card-header">
-                        <h3>Quiet Reflection</h3>
-                        <span class="live-badge">Chat</span>
-                    </div>
-                    <p class="table-host">Hosted by <strong>Leo</strong></p>
-                    <div class="table-stats">
-                        <span>Shared Silence</span>
-                        <span>6 Present</span>
-                    </div>
-                    <button class="join-room-btn">Join Room</button>
-                </div>
+            <div class="cards tables-grid" id="chat-rooms-grid">
+                <!-- Chat rooms will load dynamically here -->
             </div>
-        </div>
         </div>
     </section>
 
@@ -188,8 +156,8 @@
         <p>We are still here with you.</p>
     </footer>
 
-    <script src="config.js"></script>
-    <script src="script.js"></script>
+    <script src="config.js?v=1.0.1"></script>
+    <script src="script.js?v=1.0.1"></script>
     <script>
         function switchRoomTab(tabName) {
             const voiceTab = document.getElementById('voice-rooms-tab');

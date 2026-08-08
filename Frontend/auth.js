@@ -1,3 +1,4 @@
+const localStorage = window.safeStorage || window.localStorage;
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
