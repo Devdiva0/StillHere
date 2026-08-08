@@ -47,14 +47,16 @@
                         <input type="password" id="signup-password" placeholder="Password" required>
                     </div>
                     <button type="button" class="primary-btn wide" id="signup-next-btn">Continue</button>
-                    <p class="auth-switch">Already with us? <a href="#" id="show-login-alt">Login</a></p>
+                    <p class="auth-switch">Already with us? <a href="#" id="show-login">Login</a></p>
                 </div>
 
                 <!-- Step 2: Customization (Initially hidden) -->
                 <div id="signup-step-2" class="signup-step hidden">
                     <div class="input-group" style="text-align: left; margin-bottom: 15px;">
-                        <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Language</label>
-                        <input type="text" id="signup-languages" list="languages-list" placeholder="Choose language..." required value="English">
+                        <label
+                            style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Language</label>
+                        <input type="text" id="signup-languages" list="languages-list" placeholder="Choose language..."
+                            required value="English">
                         <datalist id="languages-list">
                             <option value="English">English</option>
                             <option value="Korean">Korean</option>
@@ -78,8 +80,11 @@
 
                     <div style="display: flex; gap: 15px; text-align: left; margin-bottom: 20px;">
                         <div style="flex: 1;">
-                            <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Avatar Emoji</label>
-                            <select id="signup-avatar" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; cursor: pointer;">
+                            <label
+                                style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Avatar
+                                Emoji</label>
+                            <select id="signup-avatar"
+                                style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; cursor: pointer;">
                                 <option value="🦊">🦊 Fox</option>
                                 <option value="🐰">🐰 Rabbit</option>
                                 <option value="🦁">🦁 Lion</option>
@@ -94,13 +99,17 @@
                             </select>
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Theme Color</label>
-                            <input type="color" id="signup-color" value="#39b59e" style="width: 100%; height: 45px; background: none; border: none; cursor: pointer; padding: 0;" />
+                            <label
+                                style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Theme
+                                Color</label>
+                            <input type="color" id="signup-color" value="#39b59e"
+                                style="width: 100%; height: 45px; background: none; border: none; cursor: pointer; padding: 0;" />
                         </div>
                     </div>
 
                     <button type="submit" class="primary-btn wide" id="signup-submit-btn">Start Presence</button>
-                    <p class="auth-switch"><a href="#" id="signup-back-btn" style="opacity: 0.6;">← Back to details</a></p>
+                    <p class="auth-switch"><a href="#" id="signup-back-btn" style="opacity: 0.6;">← Back to details</a>
+                    </p>
                 </div>
             </form>
 
