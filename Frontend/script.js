@@ -869,9 +869,17 @@ const loadRoomDetails = async () => {
         const currentUser = JSON.parse(localStorage.getItem('stillhere_user'));
         const leaveBtn = document.getElementById('leave-room-action-btn');
         const isHost = currentUser && room.hostName === currentUser.username;
-        if (leaveBtn && isHost) {
-            leaveBtn.innerHTML = '<span class="material-symbols-outlined ctrl-icon">cancel</span> End Room';
-            leaveBtn.title = "End Room and Close Space";
+        
+        let userIsSpeaker = isHost;
+        let userIsAdmin = isHost;
+
+        // Retrieve persisted role for this room
+        const storedRole = safeStorage.getItem(`stillhere_role_${roomId}`);
+        if (storedRole === 'host') {
+            userIsAdmin = true;
+            userIsSpeaker = true;
+        } else if (storedRole === 'speaker') {
+            userIsSpeaker = true;
         }
 
         // Connect socket and register in the room
@@ -882,8 +890,8 @@ const loadRoomDetails = async () => {
                     username: currentUser ? currentUser.username : 'Guest',
                     avatar: currentUser ? currentUser.avatar : '👤',
                     color: currentUser ? currentUser.color : '#ccc',
-                    isSpeaker: isHost,
-                    isAdmin: isHost
+                    isSpeaker: userIsSpeaker,
+                    isAdmin: userIsAdmin
                 }
             });
         }
@@ -900,6 +908,17 @@ const renderParticipants = (participants) => {
     const currentParticipant = participants.find(u => u.username === currentUser?.username);
     const currentUserIsAdmin = currentParticipant?.isAdmin || false;
     isAdminUser = currentUserIsAdmin;
+
+    // Persist current user's role to safeStorage
+    if (currentUser && currentRoomId && currentParticipant) {
+        if (currentParticipant.isAdmin) {
+            safeStorage.setItem(`stillhere_role_${currentRoomId}`, 'host');
+        } else if (currentParticipant.isSpeaker) {
+            safeStorage.setItem(`stillhere_role_${currentRoomId}`, 'speaker');
+        } else {
+            safeStorage.removeItem(`stillhere_role_${currentRoomId}`);
+        }
+    }
 
     // Toggle mic button based on speaker/admin status
     const micBtn = document.getElementById('mic-toggle-btn');
