@@ -11,12 +11,16 @@
     background: var(--card-bg);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 40px;
+    padding: 40px 40px 30px 40px;
     border-radius: 30px;
     width: 100%;
     max-width: 400px;
+    height: 520px;
+    box-sizing: border-box;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .auth-header {
@@ -45,6 +49,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    flex: 1;
 }
 
 .input-group input, .auth-input {
@@ -74,9 +79,10 @@
 }
 
 .auth-switch {
-    margin-top: 20px;
+    margin-top: auto;
     font-size: 0.9rem;
     color: var(--text-secondary);
+    padding-top: 15px;
 }
 
 .auth-switch a {
@@ -114,6 +120,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    flex: 1;
 }
 .signup-step.hidden {
     display: none !important;
