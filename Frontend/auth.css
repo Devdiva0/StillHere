@@ -107,3 +107,12 @@
     background: rgba(160, 210, 171, 0.1);
     color: #a0d2ab;
 }
+
+.signup-step {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.signup-step.hidden {
+    display: none !important;
+}

@@ -36,7 +36,7 @@
             <!-- Signup Form -->
             <form id="signup-form" class="auth-form hidden" onsubmit="return false;">
                 <!-- Step 1: Account details -->
-                <div id="signup-step-1">
+                <div id="signup-step-1" class="signup-step">
                     <div class="input-group">
                         <input type="text" id="signup-username" placeholder="Username" required>
                     </div>
@@ -47,11 +47,11 @@
                         <input type="password" id="signup-password" placeholder="Password" required>
                     </div>
                     <button type="button" class="primary-btn wide" id="signup-next-btn">Continue</button>
-                    <p class="auth-switch">New here? <a href="#" id="show-login-alt">Sign in instead</a></p>
+                    <p class="auth-switch">Already with us? <a href="#" id="show-login-alt">Sign in</a></p>
                 </div>
 
                 <!-- Step 2: Customization (Initially hidden) -->
-                <div id="signup-step-2" class="hidden">
+                <div id="signup-step-2" class="signup-step hidden">
                     <div class="input-group" style="text-align: left; margin-bottom: 15px;">
                         <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Language</label>
                         <input type="text" id="signup-languages" list="languages-list" placeholder="Choose language..." required value="English">
