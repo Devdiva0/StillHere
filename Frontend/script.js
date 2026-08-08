@@ -460,6 +460,116 @@ if (homeFeed && sentinel) {
     scrollObserver.observe(sentinel);
 }
 
+// Share page moments feed logic
+const momentsFeed = document.getElementById('moments-feed');
+if (momentsFeed) {
+    // Clear static mock posts
+    momentsFeed.innerHTML = '';
+
+    // Load initial posts from backend
+    const loadSharePagePosts = async () => {
+        try {
+            const response = await fetch(`${CONFIG.API_URL}/api/posts`);
+            if (response.ok) {
+                const posts = await response.json();
+                posts.forEach(postData => {
+                    momentsFeed.appendChild(window.createPostElement(postData));
+                });
+            }
+        } catch (err) {
+            console.error("Failed to load posts in share feed", err);
+        }
+    };
+    loadSharePagePosts();
+
+    // Hook composer media preview
+    const mediaInput = document.getElementById('media-upload');
+    const previewContainer = document.getElementById('media-preview-container');
+    const previewImage = document.getElementById('media-preview-image');
+    let sharePageMedia = null;
+
+    if (mediaInput) {
+        mediaInput.onchange = (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    sharePageMedia = {
+                        url: event.target.result,
+                        type: file.type.startsWith('video/') ? 'video' : 'image'
+                    };
+                    if (previewImage) {
+                        if (sharePageMedia.type === 'image') {
+                            previewImage.src = sharePageMedia.url;
+                        } else {
+                            previewImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" fill="%231a1618"><rect width="200" height="150"/><text x="20" y="80" fill="%23a6959c" font-family="sans-serif">Video Attached</text></svg>';
+                        }
+                    }
+                    if (previewContainer) previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+    }
+
+    window.removeMedia = () => {
+        if (mediaInput) mediaInput.value = '';
+        if (previewContainer) previewContainer.style.display = 'none';
+        if (previewImage) previewImage.src = '';
+        sharePageMedia = null;
+    };
+
+    // Override postMoment to use real backend API
+    window.postMoment = async () => {
+        const input = document.getElementById('moment-input');
+        if (!input) return;
+        const text = input.value.trim();
+        if (!text && !sharePageMedia) return;
+
+        const token = safeStorage.getItem('stillhere_token');
+        if (!token) {
+            alert("Please log in to share a moment.");
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        const postData = {
+            text: text,
+            media: sharePageMedia ? sharePageMedia.url : null,
+            mediaType: sharePageMedia ? sharePageMedia.type : null
+        };
+
+        try {
+            const response = await fetch(`${CONFIG.API_URL}/api/posts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(postData)
+            });
+
+            if (response.ok) {
+                const savedPost = await response.json();
+                // Prepend to feed
+                momentsFeed.insertBefore(window.createPostElement(savedPost), momentsFeed.firstChild);
+                
+                // Reset composer
+                input.value = '';
+                window.removeMedia();
+                showToast("Moment shared to the quiet.");
+            } else {
+                alert("Failed to share moment. Please log in again.");
+                safeStorage.removeItem('stillhere_token');
+                window.location.href = 'auth.html';
+            }
+        } catch (err) {
+            console.error("Error creating post", err);
+            alert("Network error. Please try again.");
+        }
+    };
+}
+
 // Scroll Reveal Animations
 const revealElements = document.querySelectorAll(".reveal, .reveal-stagger");
 
