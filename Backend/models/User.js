@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         const list = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
         return list[Math.floor(Math.random() * list.length)];
     }},
+    bio: { type: String, default: 'Finding calm in the noise. Slowly building a digital sanctuary. Happy to just listen, rarely speaking unless asked.' },
+    languages: { type: String, default: 'KO, EN' },
+    hoursListened: { type: Number, default: 0 },
+    tablesJoined: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
