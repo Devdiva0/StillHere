@@ -239,6 +239,8 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
                 text,
                 media,
                 mediaType,
+                count: 0,
+                supportedBy: [],
                 createdAt: new Date()
             };
             memoryDB.posts.push(newPost);
@@ -264,6 +266,55 @@ app.get('/api/posts/me', authenticateToken, async (req, res) => {
             const posts = memoryDB.posts.filter(p => p.name === username)
                 .sort((a, b) => b.createdAt - a.createdAt);
             res.json(posts);
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+// --- MOMENTS (POSTS) SUPPORT API ---
+app.post('/api/posts/:id/support', authenticateToken, async (req, res) => {
+    try {
+        const username = req.user.username;
+        if (mongoose.connection.readyState === 1) {
+            const post = await Post.findById(req.params.id);
+            if (!post) return res.status(404).json({ error: 'Post not found' });
+
+            if (!post.supportedBy) post.supportedBy = [];
+            
+            const index = post.supportedBy.indexOf(username);
+            if (index > -1) {
+                // Already supported, toggle to unsupport
+                post.supportedBy.splice(index, 1);
+                post.count = Math.max(0, post.count - 1);
+            } else {
+                // Support
+                post.supportedBy.push(username);
+                post.count = (post.count || 0) + 1;
+            }
+
+            await post.save();
+            io.emit('post-supported', { postId: post._id, count: post.count, supportedBy: post.supportedBy });
+            res.json(post);
+        } else {
+            const post = memoryDB.posts.find(p => p._id === req.params.id);
+            if (!post) return res.status(404).json({ error: 'Post not found' });
+
+            if (!post.supportedBy) post.supportedBy = [];
+            
+            const index = post.supportedBy.indexOf(username);
+            if (index > -1) {
+                // Already supported, toggle to unsupport
+                post.supportedBy.splice(index, 1);
+                post.count = Math.max(0, post.count - 1);
+            } else {
+                // Support
+                post.supportedBy.push(username);
+                post.count = (post.count || 0) + 1;
+            }
+
+            io.emit('post-supported', { postId: post._id, count: post.count, supportedBy: post.supportedBy });
+            res.json(post);
         }
     } catch (err) {
         res.status(500).json({ error: `Server error: ${err.message}` });
