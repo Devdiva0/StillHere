@@ -152,8 +152,27 @@
                     <textarea id="edit-bio-input" rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; resize: none;"></textarea>
                 </div>
                 <div style="text-align: left;">
-                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Languages (comma-separated)</label>
-                    <input type="text" id="edit-languages-input" class="modal-input-field" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px;" />
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Language</label>
+                    <input type="text" id="edit-languages-input" list="edit-languages-list" class="modal-input-field" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px;" />
+                    <datalist id="edit-languages-list">
+                        <option value="English">English</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Turkish">Turkish</option>
+                        <option value="Vietnamese">Vietnamese</option>
+                        <option value="Dutch">Dutch</option>
+                        <option value="Polish">Polish</option>
+                        <option value="Swedish">Swedish</option>
+                    </datalist>
                 </div>
                 <div style="display: flex; gap: 15px; text-align: left;">
                     <div style="flex: 1;">

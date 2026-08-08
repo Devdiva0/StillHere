@@ -46,8 +46,27 @@
                 </div>
 
                 <div class="input-group" style="text-align: left; margin-bottom: 15px;">
-                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Languages (e.g. KO, EN)</label>
-                    <input type="text" id="signup-languages" placeholder="Languages (e.g. KO, EN)" required value="KO, EN">
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Language</label>
+                    <input type="text" id="signup-languages" list="languages-list" placeholder="Choose language..." required value="English">
+                    <datalist id="languages-list">
+                        <option value="English">English</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Turkish">Turkish</option>
+                        <option value="Vietnamese">Vietnamese</option>
+                        <option value="Dutch">Dutch</option>
+                        <option value="Polish">Polish</option>
+                        <option value="Swedish">Swedish</option>
+                    </datalist>
                 </div>
 
                 <div style="display: flex; gap: 15px; text-align: left; margin-bottom: 20px;">
