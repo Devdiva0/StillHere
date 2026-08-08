@@ -8,6 +8,7 @@ const postSchema = new mongoose.Schema({
     media: { type: String },
     mediaType: { type: String },
     count: { type: Number, default: 0 },
+    supportedBy: { type: [String], default: [] },
     createdAt: { type: Date, default: Date.now }
 });
 

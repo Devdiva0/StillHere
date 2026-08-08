@@ -330,6 +330,7 @@ window.createPostElement = (postData) => {
         return date.toLocaleDateString();
     };
 
+    const hasSupported = user && postData.supportedBy && postData.supportedBy.includes(user.username);
     const isOwner = user && postData.name === user.username;
 
     post.innerHTML = `
@@ -352,9 +353,9 @@ window.createPostElement = (postData) => {
             ${mediaHtml}
         </div>
         <div class="post-actions">
-            <button class="support-btn" onclick="toggleSupport(this, ${postData.count || 0})">
+            <button class="support-btn ${hasSupported ? 'supported' : ''}" onclick="toggleSupport(event, '${postData._id || postData.id}', this)">
                 <span class="icon">👍</span>
-                <span class="support-text">Support</span>
+                <span class="support-text">${hasSupported ? 'Supported' : 'Support'}</span>
                 <span class="support-count">・ ${postData.count || 0}</span>
             </button>
         </div>
@@ -362,24 +363,65 @@ window.createPostElement = (postData) => {
     return post;
 };
 
+window.toggleSupport = async (event, postId, btnElement) => {
+    if (event) event.stopPropagation();
 
-// Toggle Support (Flower/Thumbs up)
-window.toggleSupport = (btn, initialCount) => {
-    const isSupported = btn.classList.toggle('supported');
-    const countSpan = btn.querySelector('.support-count');
-    const textSpan = btn.querySelector('.support-text');
+    const token = safeStorage.getItem('stillhere_token');
+    if (!token) {
+        alert("Please log in to support moments.");
+        window.location.href = 'auth.html';
+        return;
+    }
 
-    let currentCount = parseInt(countSpan.textContent.replace('・ ', '')) || initialCount;
+    // Optimistic UI updates
+    const isSupported = btnElement.classList.toggle('supported');
+    const countSpan = btnElement.querySelector('.support-count');
+    const textSpan = btnElement.querySelector('.support-text');
+    let currentCount = parseInt(countSpan.textContent.replace('・ ', '')) || 0;
 
     if (isSupported) {
         currentCount++;
         textSpan.textContent = 'Supported';
     } else {
-        currentCount--;
+        currentCount = Math.max(0, currentCount - 1);
         textSpan.textContent = 'Support';
     }
-
     countSpan.textContent = `・ ${currentCount}`;
+
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/api/posts/${postId}/support`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            // Rollback on failure
+            btnElement.classList.toggle('supported');
+            if (isSupported) {
+                currentCount = Math.max(0, currentCount - 1);
+                textSpan.textContent = 'Support';
+            } else {
+                currentCount++;
+                textSpan.textContent = 'Supported';
+            }
+            countSpan.textContent = `・ ${currentCount}`;
+            alert("Failed to save support. Please try again.");
+        }
+    } catch (err) {
+        console.error("Support API error", err);
+        // Rollback on failure
+        btnElement.classList.toggle('supported');
+        if (isSupported) {
+            currentCount = Math.max(0, currentCount - 1);
+            textSpan.textContent = 'Support';
+        } else {
+            currentCount++;
+            textSpan.textContent = 'Supported';
+        }
+        countSpan.textContent = `・ ${currentCount}`;
+    }
 };
 
 // Delete moment post
@@ -800,6 +842,31 @@ if (typeof io !== 'undefined') {
         if (currentUser && postData.name === currentUser.username) {
             insertIntoFeed(document.getElementById('user-moments-feed'));
         }
+    });
+
+    socket.on('post-supported', (data) => {
+        const cards = document.querySelectorAll(`[data-id="${data.postId}"]`);
+        cards.forEach(card => {
+            const countSpan = card.querySelector('.support-count');
+            const textSpan = card.querySelector('.support-text');
+            const btn = card.querySelector('.support-btn');
+            
+            if (countSpan) {
+                countSpan.textContent = `・ ${data.count}`;
+            }
+            
+            const currentUser = JSON.parse(safeStorage.getItem('stillhere_user') || 'null');
+            if (currentUser && btn && textSpan) {
+                const isSupported = data.supportedBy && data.supportedBy.includes(currentUser.username);
+                if (isSupported) {
+                    btn.classList.add('supported');
+                    textSpan.textContent = 'Supported';
+                } else {
+                    btn.classList.remove('supported');
+                    textSpan.textContent = 'Support';
+                }
+            }
+        });
     });
 }
 
