@@ -1,6 +1,6 @@
 const CONFIG = {
     // If you deploy your backend to Render, enter your Render service URL here (e.g. 'https://stillhere.onrender.com')
-    RENDER_URL: '', 
+    RENDER_URL: 'https://stillhere-a6ty.onrender.com',
 
     get API_URL() {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
