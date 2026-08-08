@@ -106,33 +106,71 @@
                 <h2 class="profile-name" id="user-profile-name">Fox</h2>
                 <p class="profile-username" id="user-profile-username">@quiet_fox</p>
 
-                <p class="profile-bio">
+                <p class="profile-bio" id="user-profile-bio">
                     Finding calm in the noise. Slowly building a digital sanctuary.
                     Happy to just listen, rarely speaking unless asked.
                 </p>
 
                 <div class="profile-stats">
                     <div class="stat-box">
-                        <span class="stat-number">28</span>
+                        <span class="stat-number" id="user-hours-listened">0</span>
                         <span class="stat-label">Hours Listened</span>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-number">4</span>
+                        <span class="stat-number" id="user-tables-joined">0</span>
                         <span class="stat-label">Tables Joined</span>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-number">KO, EN</span>
+                        <span class="stat-number" id="user-languages">KO, EN</span>
                         <span class="stat-label">Languages</span>
                     </div>
                 </div>
 
                 <div class="profile-actions">
-                    <button class="primary-btn">Edit Profile</button>
+                    <button class="primary-btn" onclick="openEditProfileModal()">Edit Profile</button>
                     <button class="secondary-btn" onclick="logout()">Sign Out</button>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal-overlay" onclick="closeEditProfileModal(event)">
+        <div class="share-modal" onclick="event.stopPropagation()">
+            <span class="material-symbols-outlined modal-close" onclick="closeEditProfileModal()">close</span>
+            <div class="share-modal-header">
+                <h2>Edit Profile</h2>
+                <p>Update your presence in the quiet.</p>
+            </div>
+            <div class="modal-compose-box" style="gap: 15px; display: flex; flex-direction: column;">
+                <div style="text-align: left;">
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Username</label>
+                    <input type="text" id="edit-username-input" class="modal-input-field" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px;" />
+                </div>
+                <div style="text-align: left;">
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Bio</label>
+                    <textarea id="edit-bio-input" rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; resize: none;"></textarea>
+                </div>
+                <div style="text-align: left;">
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Languages (comma-separated)</label>
+                    <input type="text" id="edit-languages-input" class="modal-input-field" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px;" />
+                </div>
+                <div style="display: flex; gap: 15px; text-align: left;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Avatar Emoji</label>
+                        <input type="text" id="edit-avatar-input" maxlength="2" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; text-align: center;" />
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block;">Theme Color</label>
+                        <input type="color" id="edit-color-input" style="width: 100%; height: 45px; background: none; border: none; cursor: pointer; padding: 0;" />
+                    </div>
+                </div>
+                <div class="modal-compose-actions" style="margin-top: 10px;">
+                    <button class="modal-post-btn" onclick="saveProfileChanges()" style="width: 100%;">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- User's Moments -->
     <section class="section reveal user-moments-section" style="margin-top: 40px;">
