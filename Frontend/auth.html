@@ -44,6 +44,35 @@
                 <div class="input-group">
                     <input type="password" id="signup-password" placeholder="Password" required>
                 </div>
+
+                <div class="input-group" style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Languages (e.g. KO, EN)</label>
+                    <input type="text" id="signup-languages" placeholder="Languages (e.g. KO, EN)" required value="KO, EN">
+                </div>
+
+                <div style="display: flex; gap: 15px; text-align: left; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Avatar Emoji</label>
+                        <select id="signup-avatar" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-primary); font-family: 'Inter'; font-size: 14px; cursor: pointer;">
+                            <option value="🦊">🦊 Fox</option>
+                            <option value="🐰">🐰 Rabbit</option>
+                            <option value="🦁">🦁 Lion</option>
+                            <option value="🐢">🐢 Turtle</option>
+                            <option value="🕊️">🕊️ Bird</option>
+                            <option value="🌿">🌿 Leaf</option>
+                            <option value="🌙">🌙 Moon</option>
+                            <option value="🌊">🌊 Wave</option>
+                            <option value="🕯️">🕯️ Candle</option>
+                            <option value="🌸" selected>🌸 Flower</option>
+                            <option value="✨">✨ Sparkles</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 5px; display: block; color: var(--text-primary);">Theme Color</label>
+                        <input type="color" id="signup-color" value="#39b59e" style="width: 100%; height: 45px; background: none; border: none; cursor: pointer; padding: 0;" />
+                    </div>
+                </div>
+
                 <button type="submit" class="primary-btn wide">Start Presence</button>
                 <p class="auth-switch">Already with us? <a href="#" id="show-login">Sign in</a></p>
             </form>
