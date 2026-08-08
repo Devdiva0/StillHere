@@ -9,6 +9,7 @@ require('dotenv').config();
 const Post = require('./models/Post');
 const Waitlist = require('./models/Waitlist');
 const User = require('./models/User');
+const Table = require('./models/Table');
 
 // In-Memory Database Fallback Store
 const memoryDB = {
@@ -39,7 +40,8 @@ const memoryDB = {
             createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000)
         }
     ],
-    waitlist: []
+    waitlist: [],
+    tables: []
 };
 
 const app = express();
@@ -240,8 +242,18 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
             await newPost.save();
             res.status(201).json(newPost);
         } else {
-            const user = memoryDB.users.find(u => u._id === req.user.id);
-            if (!user) return res.status(404).json({ error: 'User not found' });
+            let user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) {
+                // Fallback user metadata from verified token
+                const avatars = ['🦊', '🐰', '🦁', '🐢', '🕊️', '🌿', '🌙', '🌊', '🕯️', '🌸', '✨'];
+                const colors = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
+                user = {
+                    _id: req.user.id,
+                    username: req.user.username,
+                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                };
+            }
 
             const newPost = {
                 _id: String(memoryDB.posts.length + 1),
@@ -270,9 +282,9 @@ app.get('/api/posts/me', authenticateToken, async (req, res) => {
             res.json(posts);
         } else {
             const user = memoryDB.users.find(u => u._id === req.user.id);
-            if (!user) return res.status(404).json({ error: 'User not found' });
+            const username = user ? user.username : req.user.username;
 
-            const posts = memoryDB.posts.filter(p => p.name === user.username)
+            const posts = memoryDB.posts.filter(p => p.name === username)
                 .sort((a, b) => b.createdAt - a.createdAt);
             res.json(posts);
         }
@@ -281,14 +293,239 @@ app.get('/api/posts/me', authenticateToken, async (req, res) => {
     }
 });
 
+// --- MOMENTS (POSTS) DELETE API ---
+app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
+    try {
+        if (mongoose.connection.readyState === 1) {
+            const post = await Post.findById(req.params.id);
+            if (!post) return res.status(404).json({ error: 'Post not found' });
+            
+            // Check authorization
+            if (post.name !== req.user.username) {
+                return res.status(403).json({ error: 'You can only delete your own posts' });
+            }
+            
+            await Post.findByIdAndDelete(req.params.id);
+            res.json({ message: 'Post deleted successfully' });
+        } else {
+            const postIndex = memoryDB.posts.findIndex(p => p._id === req.params.id);
+            if (postIndex === -1) return res.status(404).json({ error: 'Post not found' });
+            
+            if (memoryDB.posts[postIndex].name !== req.user.username) {
+                return res.status(403).json({ error: 'You can only delete your own posts' });
+            }
+            
+            memoryDB.posts.splice(postIndex, 1);
+            res.json({ message: 'Post deleted successfully' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+// --- TABLES (ROOMS) API ---
+app.get('/api/tables', async (req, res) => {
+    try {
+        if (mongoose.connection.readyState === 1) {
+            const tables = await Table.find({ status: 'active' }).sort({ createdAt: -1 });
+            res.json(tables);
+        } else {
+            const activeTables = memoryDB.tables
+                .filter(t => t.status === 'active')
+                .sort((a, b) => b.createdAt - a.createdAt);
+            res.json(activeTables);
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+app.post('/api/tables', authenticateToken, async (req, res) => {
+    const { title, type } = req.body;
+    if (!title) return res.status(400).json({ error: 'Room title is required' });
+
+    try {
+        if (mongoose.connection.readyState === 1) {
+            const user = await User.findById(req.user.id);
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            const newTable = new Table({
+                title,
+                type: type || 'voice',
+                hostId: user._id.toString(),
+                hostName: user.username,
+                hostAvatar: user.avatar,
+                hostColor: user.color,
+                status: 'active'
+            });
+            await newTable.save();
+            res.status(201).json(newTable);
+        } else {
+            let user = memoryDB.users.find(u => u._id === req.user.id);
+            if (!user) {
+                // Fallback user metadata from verified token
+                const avatars = ['🦊', '🐰', '🦁', '🐢', '🕊️', '🌿', '🌙', '🌊', '🕯️', '🌸', '✨'];
+                const colors = ['#39b59e', '#a685e2', '#f5a88c', '#85c1e2', '#f5d38c', '#85e2a6'];
+                user = {
+                    _id: req.user.id,
+                    username: req.user.username,
+                    avatar: avatars[Math.floor(Math.random() * avatars.length)],
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                };
+            }
+
+            const newTable = {
+                _id: String(memoryDB.tables.length + 1),
+                title,
+                type: type || 'voice',
+                hostId: user._id,
+                hostName: user.username,
+                hostAvatar: user.avatar,
+                hostColor: user.color,
+                status: 'active',
+                createdAt: new Date()
+            };
+            memoryDB.tables.push(newTable);
+            console.log("Created table in memoryDB:", newTable);
+            res.status(201).json(newTable);
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+app.get('/api/tables/:id', async (req, res) => {
+    try {
+        console.log("GET /api/tables/:id requested, ID:", req.params.id, "Mongoose readyState:", mongoose.connection.readyState);
+        if (mongoose.connection.readyState === 1) {
+            const table = await Table.findById(req.params.id);
+            if (!table) {
+                console.log("Table not found in MongoDB:", req.params.id);
+                return res.status(404).json({ error: 'Room not found' });
+            }
+            res.json(table);
+        } else {
+            console.log("Searching in memoryDB tables:", memoryDB.tables);
+            const table = memoryDB.tables.find(t => t._id === req.params.id);
+            if (!table) {
+                console.log("Table not found in memoryDB:", req.params.id);
+                return res.status(404).json({ error: 'Room not found' });
+            }
+            res.json(table);
+        }
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+app.delete('/api/tables/:id', authenticateToken, async (req, res) => {
+    try {
+        let isHost = false;
+        let tableData = null;
+
+        if (mongoose.connection.readyState === 1) {
+            const table = await Table.findById(req.params.id);
+            if (!table) return res.status(404).json({ error: 'Room not found' });
+            
+            if (table.hostId === req.user.id) {
+                isHost = true;
+                tableData = table;
+                // Delete or set to ended
+                await Table.findByIdAndDelete(req.params.id);
+            }
+        } else {
+            const tableIndex = memoryDB.tables.findIndex(t => t._id === req.params.id);
+            if (tableIndex === -1) return res.status(404).json({ error: 'Room not found' });
+            
+            const table = memoryDB.tables[tableIndex];
+            if (table.hostId === req.user.id) {
+                isHost = true;
+                tableData = table;
+                memoryDB.tables.splice(tableIndex, 1);
+            }
+        }
+
+        if (!isHost) {
+            return res.status(403).json({ error: 'Only the host can end this room' });
+        }
+
+        // Notify socket clients in the room
+        io.to(req.params.id).emit('room-ended');
+        res.json({ message: 'Room ended successfully' });
+    } catch (err) {
+        res.status(500).json({ error: `Server error: ${err.message}` });
+    }
+});
+
+
+// Keep track of active room participants
+const activeRooms = {};
+
+async function endRoom(roomId) {
+    try {
+        console.log(`Automatically ending room ${roomId}`);
+        if (mongoose.connection.readyState === 1) {
+            await Table.findByIdAndDelete(roomId);
+        } else {
+            const tableIndex = memoryDB.tables.findIndex(t => t._id === roomId);
+            if (tableIndex !== -1) {
+                memoryDB.tables.splice(tableIndex, 1);
+            }
+        }
+        
+        // Notify all users in the room
+        io.to(roomId).emit('room-ended');
+        
+        // Cleanup active room list
+        if (activeRooms[roomId]) {
+            delete activeRooms[roomId];
+        }
+    } catch (err) {
+        console.error(`Error automatically ending room ${roomId}:`, err.message);
+    }
+}
 
 // --- SOCKET.IO ---
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    socket.on('join-room', (roomId) => {
+    socket.on('join-room', (data) => {
+        // Support both old string format and new object format
+        let roomId, user;
+        if (typeof data === 'string') {
+            roomId = data;
+            user = { username: 'Someone_' + socket.id.substring(0, 4), avatar: '👤', color: '#ccc' };
+        } else {
+            roomId = data.roomId;
+            user = data.user;
+        }
+
         socket.join(roomId);
-        console.log(`User ${socket.id} joined room: ${roomId}`);
+        socket.roomId = roomId;
+        if (!activeRooms[roomId]) {
+            activeRooms[roomId] = [];
+        }
+
+        // Clean duplicates but preserve original join timestamp if they already have one
+        const existingUser = activeRooms[roomId].find(u => u.username === user.username);
+        const joinedAt = existingUser ? existingUser.joinedAt : Date.now();
+
+        socket.user = {
+            username: user.username,
+            avatar: user.avatar,
+            color: user.color,
+            isSpeaker: user.isSpeaker || false,
+            isAdmin: user.isAdmin || false,
+            socketId: socket.id,
+            joinedAt: joinedAt
+        };
+
+        // Clean duplicates
+        activeRooms[roomId] = activeRooms[roomId].filter(u => u.username !== user.username);
+        activeRooms[roomId].push(socket.user);
+
+        console.log(`User ${user.username} joined room: ${roomId}`);
+        io.to(roomId).emit('update-participants', activeRooms[roomId]);
     });
 
     socket.on('send-message', (data) => {
@@ -296,8 +533,131 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('receive-message', { message, user, id: socket.id });
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
+    socket.on('audio-chunk', (data) => {
+        const { roomId, username, chunk, sampleRate } = data;
+        socket.to(roomId).emit('audio-chunk', { username, chunk, sampleRate });
+    });
+
+    socket.on('request-chair', ({ roomId, user }) => {
+        console.log(`User ${user.username} requested a chair in room ${roomId}`);
+        io.to(roomId).emit('chair-requested', { user });
+    });
+
+    socket.on('permit-chair', ({ roomId, username }) => {
+        console.log(`Host permitted chair for ${username} in room ${roomId}`);
+        if (activeRooms[roomId]) {
+            const speakersCount = activeRooms[roomId].filter(u => u.isSpeaker || u.isAdmin).length;
+            if (speakersCount >= 6) {
+                socket.emit('error-msg', { message: 'Cannot permit chair: Speakers capacity (6) has been reached.' });
+                return;
+            }
+
+            const participant = activeRooms[roomId].find(u => u.username === username);
+            if (participant) {
+                participant.isSpeaker = true;
+            }
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+        }
+        io.to(roomId).emit('chair-permitted', { username });
+    });
+
+    socket.on('make-admin', ({ roomId, username }) => {
+        console.log(`User ${username} promoted to admin in room ${roomId}`);
+        if (activeRooms[roomId]) {
+            const participant = activeRooms[roomId].find(u => u.username === username);
+            if (participant) {
+                participant.isAdmin = true;
+                participant.isSpeaker = true; // admins are speakers
+            }
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+        }
+        io.to(roomId).emit('user-promoted-to-admin', { username });
+    });
+
+    socket.on('invite-to-speak', ({ roomId, username }) => {
+        console.log(`Host invited ${username} to speak in room ${roomId}`);
+        io.to(roomId).emit('speak-invitation-received', { username });
+    });
+
+    socket.on('accept-speak-invitation', ({ roomId, username }) => {
+        console.log(`${username} accepted speak invitation in room ${roomId}`);
+        if (activeRooms[roomId]) {
+            const speakersCount = activeRooms[roomId].filter(u => u.isSpeaker || u.isAdmin).length;
+            if (speakersCount >= 6) {
+                socket.emit('error-msg', { message: 'Cannot join stage: Speakers capacity (6) has been reached.' });
+                return;
+            }
+
+            const participant = activeRooms[roomId].find(u => u.username === username);
+            if (participant) {
+                participant.isSpeaker = true;
+            }
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+        }
+        io.to(roomId).emit('chair-permitted', { username });
+    });
+
+    socket.on('decline-speak-invitation', ({ roomId, username }) => {
+        console.log(`${username} declined speak invitation in room ${roomId}`);
+        io.to(roomId).emit('speak-invitation-declined', { username });
+    });
+
+    socket.on('demote-speaker', ({ roomId, username }) => {
+        console.log(`Host demoted ${username} in room ${roomId}`);
+        if (activeRooms[roomId]) {
+            const participant = activeRooms[roomId].find(u => u.username === username);
+            if (participant) {
+                participant.isSpeaker = false;
+                participant.isAdmin = false; // Strip admin/host status if they had it
+            }
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+        }
+        io.to(roomId).emit('speaker-demoted', { username });
+    });
+
+    socket.on('leave-room', ({ roomId }) => {
+        const user = socket.user;
+        if (roomId && user && activeRooms[roomId]) {
+            console.log(`User ${user.username} explicitly left room: ${roomId}`);
+            activeRooms[roomId] = activeRooms[roomId].filter(u => u.socketId !== socket.id);
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+            
+            const anyAdminLeft = activeRooms[roomId].some(u => u.isAdmin === true);
+            if (!anyAdminLeft) {
+                console.log(`Last host explicitly left. Ending room ${roomId} immediately.`);
+                endRoom(roomId);
+            }
+        }
+    });
+
+    socket.on('disconnect', async () => {
+        const { roomId, user } = socket;
+        if (roomId && user && activeRooms[roomId]) {
+            activeRooms[roomId] = activeRooms[roomId].filter(u => u.socketId !== socket.id);
+            io.to(roomId).emit('update-participants', activeRooms[roomId]);
+            console.log(`User ${user.username} left room: ${roomId} (disconnect)`);
+            
+            // If there are no admins left, end the room automatically after a grace period (handles page refreshes)
+            const anyAdminLeft = activeRooms[roomId].some(u => u.isAdmin === true);
+            if (!anyAdminLeft) {
+                console.log(`No admins left in room ${roomId}. Starting 5-second grace period...`);
+                setTimeout(async () => {
+                    if (activeRooms[roomId]) {
+                        const anyAdminActiveNow = activeRooms[roomId].some(u => u.isAdmin === true);
+                        if (!anyAdminActiveNow) {
+                            console.log(`Grace period expired. Ending room ${roomId} automatically.`);
+                            await endRoom(roomId);
+                        } else {
+                            console.log(`Admin reconnected. Room ${roomId} will not be ended.`);
+                        }
+                    } else {
+                        await endRoom(roomId);
+                    }
+                }, 5000);
+            }
+        } else {
+            console.log('User disconnected:', socket.id);
+        }
     });
 });
 

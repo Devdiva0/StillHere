@@ -18,8 +18,8 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet" />
 
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="room.css" />
+    <link rel="stylesheet" href="global.css?v=1.0.1" />
+    <link rel="stylesheet" href="room.css?v=1.0.1" />
 </head>
 
 <body class="room-fullscreen-body">
@@ -48,102 +48,21 @@
 
                     <div class="room-layout">
                         <div class="speaker-grid">
-                            <!-- Speaker 1 (Host) -->
-                            <div class="speaker-item active-speaker">
-                                <div class="crown">👑</div>
-                                <div class="speaker-avatar" style="background: #39b59e;">
-                                    <span class="avatar-emoji">🦊</span>
-                                </div>
-                                <div class="speaker-name">Fox</div>
-                                <div class="speaker-lang">KO</div>
-                            </div>
-
-                            <!-- Speaker 2 -->
-                            <div class="speaker-item">
-                                <div class="crown">👑</div>
-                                <div class="speaker-avatar" style="background: #f5a88c;">
-                                    <span class="avatar-emoji">👩‍🏫</span>
-                                </div>
-                                <div class="speaker-name">Ashley</div>
-                                <div class="speaker-lang">EN</div>
-                            </div>
-
-                            <!-- Speaker 3 -->
-                            <div class="speaker-item">
-                                <div class="crown hidden">👑</div>
-                                <div class="speaker-avatar" style="background: #e7dac9;">
-                                    <span class="avatar-emoji">👨‍🦱</span>
-                                </div>
-                                <div class="speaker-name">Harry</div>
-                                <div class="speaker-lang">EN</div>
-                            </div>
-
-                            <!-- Speaker 4 -->
-                            <div class="speaker-item">
-                                <div class="crown hidden">👑</div>
-                                <div class="speaker-avatar" style="background: #f1d5b3;">
-                                    <span class="avatar-emoji">👩🏻</span>
-                                </div>
-                                <div class="speaker-name">한나 (Hanna)</div>
-                                <div class="speaker-lang">KO</div>
-                            </div>
-
-                            <!-- Speaker 5 -->
-                            <div class="speaker-item active-speaker">
-                                <div class="crown hidden">👑</div>
-                                <div class="speaker-avatar" style="background: #a0a8a6;">
-                                    <span class="avatar-emoji">🦙</span>
-                                </div>
-                                <div class="speaker-name">Alpaca</div>
-                                <div class="speaker-lang">EN</div>
-                            </div>
-
-                            <!-- Empty Seat -->
-                            <div class="speaker-item empty-seat" onclick="requestChair(this)">
-                                <div class="crown hidden">👑</div>
-                                <div class="speaker-avatar empty-avatar">
-                                    <span class="avatar-emoji">🪑</span>
-                                </div>
-                                <div class="speaker-name">Ask to seat</div>
-                                <div class="speaker-lang" style="opacity: 0;">-</div>
-                            </div>
+                            <!-- Dynamic speakers will load here -->
                         </div>
                     </div>
 
                     <div class="listeners-section">
                         <h3>Listen only</h3>
                         <div class="listener-scroll">
-                            <div class="listener-item invite-btn" style="cursor: pointer;">
+                            <div class="listener-item invite-btn" style="cursor: pointer;" onclick="inviteOthers()">
                                 <div class="listener-avatar invite-avatar">
                                     +
                                 </div>
                                 <div class="listener-name">Invite</div>
                                 <div class="listener-lang" style="opacity:0">-</div>
                             </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #f8dfb1;">
-                                    <span class="avatar-emoji">👱‍♀️</span>
-                                </div>
-                                <div class="listener-name">Tamika</div>
-                                <div class="listener-lang">AU</div>
-                            </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #f1ebd8;">
-                                    <span class="avatar-emoji">👨🏾</span>
-                                </div>
-                                <div class="listener-name">Daniel</div>
-                                <div class="listener-lang">ID</div>
-                            </div>
-
-                            <div class="listener-item">
-                                <div class="listener-avatar" style="background: #d8c2b5;">
-                                    <span class="avatar-emoji">👩🏽</span>
-                                </div>
-                                <div class="listener-name">지혜 (Jihye)</div>
-                                <div class="listener-lang">KO</div>
-                            </div>
+                            <!-- Dynamic listeners will load here -->
                         </div>
                     </div>
 
@@ -153,7 +72,7 @@
                             title="Turn off microphone">
                             <span class="material-symbols-outlined ctrl-icon">mic</span>
                         </button>
-                        <button class="control-btn leave-room-btn" onclick="window.location.href='tables.html'"
+                        <button class="control-btn leave-room-btn" id="leave-room-action-btn" onclick="leaveOrEndRoom()"
                             title="Leave room">
                             <span class="material-symbols-outlined ctrl-icon">call_end</span> Leave
                         </button>
@@ -172,21 +91,7 @@
 
                     <div class="chat-messages" id="chat-messages">
                         <div class="message system-message">
-                            You joined the room. Welcome to Digital Burnout.
-                        </div>
-                        <div class="message user-message">
-                            <span class="msg-author">Ashley</span>
-                            <span class="msg-text">Does anyone else feel like they need a break from social
-                                media?</span>
-                        </div>
-                        <div class="message user-message">
-                            <span class="msg-author">Harry</span>
-                            <span class="msg-text">Definitely. I deleted Instagram last week and already feel
-                                better.</span>
-                        </div>
-                        <div class="message user-message">
-                            <span class="msg-author">Tamika</span>
-                            <span class="msg-text">Same here! Just taking time to breathe.</span>
+                            You joined the room. Welcome to the space.
                         </div>
                     </div>
 
@@ -199,9 +104,9 @@
             </div>
         </div>
 
-        <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-        <script src="config.js"></script>
-        <script src="script.js"></script>
+        <script src="socket.io.js?v=1.0.1"></script>
+        <script src="config.js?v=1.0.1"></script>
+        <script src="script.js?v=1.0.1"></script>
 </body>
 
 </html>
